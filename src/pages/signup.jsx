@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 function Signup() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
-
+  const navigate=useNavigate();
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -37,7 +38,7 @@ function Signup() {
   return (
     <div className="min-h-screen flex justify-center items-center bg-center relative">
       <div className='absolute bg-[url(/bg_signup.png)] bg-center bg-cover opacity-60 z-0 inset-0'></div>
-      <form onSubmit={handleSubmit} className="bg-white/10 backdrop-blur-md p-6 border border-white/30 rounded shadow-xl w-96 relative ">
+      <form onSubmit={handleSubmit} className="bg-white/10 backdrop-blur-md p-6 border border-white/30 rounded shadow-xl w-96 relative flex flex-col">
         <h2 className="text-2xl font-bold mb-4">Sign Up</h2>
         <input
           type="text"
@@ -73,6 +74,8 @@ function Signup() {
         }}
       />
     </GoogleOAuthProvider>
+    <button className='bg-transparent text-black hover:text-gray-700 text-md cursor-pointer'onClick={()=>{navigate('/login')}}>Already have an account? Log in</button>
+
       </form>
     </div>
   );

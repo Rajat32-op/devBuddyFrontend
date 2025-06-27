@@ -1,10 +1,11 @@
 import { useState } from 'react';
+import {useNavigate} from 'react-router-dom'
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 
 function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
-
+  const navigate=useNavigate()
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -74,6 +75,7 @@ function Login() {
         }}
       />
     </GoogleOAuthProvider>
+    <button className='bg-transparent text-blue-300 hover:text-blue-400 text-md cursor-pointer'onClick={()=>{navigate('/signup')}}>Don't have an account? Create new account</button>
   </form>
 </div>
 
