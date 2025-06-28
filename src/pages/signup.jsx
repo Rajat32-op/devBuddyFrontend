@@ -22,6 +22,7 @@ function Signup() {
   const handleSubmit = async e => {
     e.preventDefault();
     const data={name:e.target.elements.name.value,
+              username:e.target.elements.username.value,
               email:e.target.elements.email.value,
               password:e.target.elements.password.value
     }
@@ -32,7 +33,9 @@ function Signup() {
       headers:{'Content-Type': 'application/json'}
     })
     const result=await response.json()
-    
+    if(result.message=="Login successful"){
+      navigate('/')
+    }
   };
 
   return (
@@ -44,6 +47,13 @@ function Signup() {
           type="text"
           name="name"
           placeholder="Name"
+          onChange={handleChange}
+          className="border-2 p-2 w-full mb-2 rounded-4xl "
+        />
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
           onChange={handleChange}
           className="border-2 p-2 w-full mb-2 rounded-4xl "
         />

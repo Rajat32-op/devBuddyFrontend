@@ -23,7 +23,7 @@ function Login() {
   const handleSubmit = async e => {
     e.preventDefault();
     // Call backend API to signup
-    const data={email:e.target.elements.email.value,
+    const data={username:e.target.elements.username.value,
               password:e.target.elements.password.value
     }
     console.log(data)
@@ -33,8 +33,10 @@ function Login() {
       headers:{'Content-Type': 'application/json'},
       credentials:"include"
     })
-    const token=await response.json()
-    console.log(token);
+    const result=await response.json()
+    if(result.message=="Login successful"){
+      navigate('/')
+    }
   };
 
   return (
@@ -46,9 +48,9 @@ function Login() {
   <form onSubmit={handleSubmit} className=" bg-black/50 backdrop-blur-md relative p-6 rounded shadow w-96 z-10 ring-2 ring-black/10">
     <h2 className="text-2xl text-white font-bold mb-4">Log In</h2>
     <input
-      type="email"
-      name="email"
-      placeholder="Email"
+      type="text"
+      name="username"
+      placeholder="Username"
       onChange={handleChange}
       className="text-white border p-2 w-full mb-2 rounded-2xl"
     />
