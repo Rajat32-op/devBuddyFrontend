@@ -5,6 +5,8 @@ import Signup  from './pages/signup'
 import Home from './pages/home'
 import Login from './pages/login'
 import AskForUsername from './pages/AskForUsername'
+import Profile from './pages/Profile'
+import Chat from './pages/Chat'
 
 function App() {
   
@@ -16,6 +18,8 @@ function App() {
             <Route index path='/login' element={<Login/>}/>
             <Route path='/signup' element={<Signup/>}/>
             <Route path='/askForUsername' element={<AskForUsername/>}/>
+            <Route path='/profile' element={<Profile/>}/>
+            <Route path='/chat' element={<Chat/>}/>
         </Routes>
       </BrowserRouter>
     </>
