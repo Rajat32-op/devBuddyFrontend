@@ -2,6 +2,7 @@ import { Heart, MessageCircle, User, Users } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { useNavigate } from "react-router-dom";
+import { div } from "framer-motion/client";
 
 const Sidebar = () => {
   const activeFriends = [
@@ -9,6 +10,7 @@ const Sidebar = () => {
     { name: "Bob Smith", status: "online" },
     { name: "Carol Johnson", status: "away" },
   ];
+  const user={name:"meow",userName:"hello"};
   const navigate=useNavigate()
 
   return (
@@ -16,18 +18,26 @@ const Sidebar = () => {
       {/* User Profile */}
       <Card>
         <CardContent className="pt-6">
-          <button onClick={()=>{navigate('/profile')}} className="flex items-center space-x-3">
+          
+            
+            <div className="flex items-center w-full justify-center">
+              {user===null?(
+                <button onClick={()=>{navigate('/login')}} className="bg-blue-600 text-xl w-[75%] text-white">Log In</button>
+              ):(
+                <button onClick={()=>{navigate('/profile')}} className="flex w-full items-center justify-start   space-x-3">
             <Avatar className="h-12 w-12">
               <AvatarImage src="/placeholder.svg" />
               <AvatarFallback>
                 <User className="h-6 w-6" />
               </AvatarFallback>
             </Avatar>
-            <div>
-              <h3 className="font-semibold">John Developer</h3>
-              <p className="text-sm text-muted-foreground">@johndev</p>
-            </div>
-          </button>
+                <div  className="flex flex-col items-center justify-center">
+                <h3 className="text-2xl">{user.name}</h3>
+                <p>{"@"+user.userName}</p>
+                </div>
+              </button>
+              )}
+              </div>
         </CardContent>
       </Card>
 
@@ -38,7 +48,7 @@ const Sidebar = () => {
         </CardHeader>
         <CardContent>
           <nav className="space-y-2 text-md">
-            <button  className="w-full flex items-center gap-2">
+            <button onClick={()=>{navigate('/profile')}}  className="w-full flex items-center gap-2">
               <User className="mr-2 h-5 w-5" />
               Profile
             </button>
@@ -46,7 +56,7 @@ const Sidebar = () => {
               <Users className="mr-2 h-5 w-5" />
               Connections
             </button>
-            <button  className="w-full flex items-center gap-2">
+            <button onClick={()=>{navigate('/chat')}} className="w-full flex items-center gap-2">
               <MessageCircle className="mr-2 h-5 w-5" />
               Messages
             </button>

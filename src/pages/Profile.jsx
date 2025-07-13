@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { User } from "lucide-react";
 import { Card, CardContent } from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import Navbar from "../components/Navbar";
 import PostCard from "../components/PostCard";
+import {  useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [userProfile] = useState({
@@ -95,8 +96,19 @@ const grouped = groupBy(users, 'role');`,
     },
   ]);
 
+  const navigate = useNavigate();
+
+  const user = {name:"Meow"};
+  useEffect(()=>{
+    if(user===null){
+    navigate('/login')
+  }
+  })
+
   return (
+
     <div className="min-h-screen bg-background text-foreground dark:bg-black dark:text-white">
+      
       <Navbar />
 
       <div className="container mx-auto px-4 py-6">

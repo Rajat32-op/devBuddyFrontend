@@ -86,7 +86,6 @@ clean_data = process_data(raw_input)`,
       tags: ["Python", "DataProcessing"]
     }
   ]);
-
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-background text-white">
       <Navbar />
