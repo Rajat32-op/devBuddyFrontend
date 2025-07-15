@@ -18,7 +18,7 @@ const AskForUsername = () => {
     e.preventDefault();
     // handle username submission logic here
     const data={username:e.target.elements.username.value}
-    let res=await fetch('http://localhost:3000/change-username',{
+    let res=await fetch('http://localhost:3000/addUserName-google',{
       method:'PATCH',
       body:JSON.stringify(data),
       credentials:'include',

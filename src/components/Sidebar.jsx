@@ -4,15 +4,21 @@ import { Card, CardContent, CardHeader } from "./ui/card";
 import { useNavigate } from "react-router-dom";
 import { div } from "framer-motion/client";
 
-const Sidebar = () => {
+const Sidebar = ({user}) => {
+  const navigate = useNavigate()
   const activeFriends = [
     { name: "Alice Cooper", status: "online" },
     { name: "Bob Smith", status: "online" },
     { name: "Carol Johnson", status: "away" },
   ];
-  const user={name:"meow",userName:"hello"};
-  const navigate=useNavigate()
-
+  if(user===null || user===undefined){
+    return(<div className="min-h-screen bg-background text-foreground dark:bg-black dark:text-white">
+      
+      <div className="container mx-auto px-4 py-6">
+        <div className="max-w-4xl mx-auto text-center text-lg">Loading...</div>
+      </div>
+    </div>)
+  }
   return (
     <div className="space-y-6">
       {/* User Profile */}
@@ -33,7 +39,7 @@ const Sidebar = () => {
             </Avatar>
                 <div  className="flex flex-col items-center justify-center">
                 <h3 className="text-2xl">{user.name}</h3>
-                <p>{"@"+user.userName}</p>
+                <p>{"@"+user.username}</p>
                 </div>
               </button>
               )}

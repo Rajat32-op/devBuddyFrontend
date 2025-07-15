@@ -7,18 +7,8 @@ import PostCard from "../components/PostCard";
 import {  useNavigate } from "react-router-dom";
 
 const Profile = () => {
-  const [userProfile] = useState({
-    name: "John Developer",
-    username: "johndev",
-    avatar: "/placeholder.svg",
-    bio: "Full-stack developer passionate about React, Node.js, and clean code. Building the future one line at a time.",
-    postsCount: 127,
-    friendsCount: 1200,
-    followersCount: 2500,
-    followingCount: 850,
-    joined: "Joined March 2023",
-  });
-
+  const navigate = useNavigate();
+  
   const [userPosts] = useState([
     {
       id: 1,
@@ -35,7 +25,7 @@ const Profile = () => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
     return user;
-  } catch (error) {
+    } catch (error) {
     throw new Error('Invalid token');
   }
 };`,
@@ -57,7 +47,7 @@ const Profile = () => {
         type: "image",
         text: "Beautiful sunset from my office window while debugging 🌅",
         imageUrl:
-          "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=500&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=500&h=300&fit=crop",
       },
       likes: 89,
       comments: 23,
@@ -75,20 +65,20 @@ const Profile = () => {
         type: "code",
         text: "Quick utility function for array manipulation",
         code: `const groupBy = (array, key) => {
-  return array.reduce((result, item) => {
-    const group = item[key];
-    if (!result[group]) {
-      result[group] = [];
-    }
-    result[group].push(item);
-    return result;
-  }, {});
-};
-
-// Usage
-const grouped = groupBy(users, 'role');`,
-        language: "javascript",
-      },
+          return array.reduce((result, item) => {
+            const group = item[key];
+            if (!result[group]) {
+              result[group] = [];
+              }
+              result[group].push(item);
+              return result;
+              }, {});
+              };
+              
+              // Usage
+              const grouped = groupBy(users, 'role');`,
+              language: "javascript",
+            },
       likes: 34,
       comments: 8,
       timestamp: "1 week ago",
@@ -96,18 +86,43 @@ const grouped = groupBy(users, 'role');`,
     },
   ]);
 
-  const navigate = useNavigate();
+  const [user, setUser] = useState(undefined);
+  useEffect(() => {
+    const fetchUser = async () => {
+      const response = await fetch("http://localhost:3000/me", {
+        method: "GET",
+        credentials: "include"
+      });
+      if (response.ok) {
+        let tempuser = await response.json();
+        setUser(tempuser);
+      }
+      else{
+        setUser(null);
+      }
+    }
+    fetchUser();
+  }, []);
+  useEffect(() => {
+    if (user===null) {
+      navigate("/login");
+    }
+  }, [user,navigate]);
 
-  const user = {name:"Meow"};
-  useEffect(()=>{
-    if(user===null){
-    navigate('/login')
-  }
-  })
-
+  if (user === undefined) {
+  // Still loading
   return (
-
     <div className="min-h-screen bg-background text-foreground dark:bg-black dark:text-white">
+      <Navbar />
+      <div className="container mx-auto px-4 py-6">
+        <div className="max-w-4xl mx-auto text-center text-lg">Loading...</div>
+      </div>
+    </div>
+  );
+}
+return (
+  
+  <div className="min-h-screen bg-background text-foreground dark:bg-black dark:text-white">
       
       <Navbar />
 
@@ -119,7 +134,7 @@ const grouped = groupBy(users, 'role');`,
               <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                 {/* Profile Picture */}
                 <Avatar className="h-32 w-32 md:h-40 md:w-40">
-                  <AvatarImage src={userProfile.avatar} />
+                  <AvatarImage src={'/placeholder.svg'} />
                   <AvatarFallback className="text-2xl">
                     <User className="h-16 w-16" />
                   </AvatarFallback>
@@ -128,7 +143,7 @@ const grouped = groupBy(users, 'role');`,
                 {/* Profile Info */}
                 <div className="flex-1 text-center md:text-left">
                   <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
-                    <h1 className="text-2xl font-bold">{userProfile.name}</h1>
+                    <h1 className="text-2xl font-bold">{user.name}</h1>
                     <div className="flex gap-2 justify-center">
                       <button className="px-3 py-1 border rounded text-sm">
                         Edit Profile
@@ -139,30 +154,23 @@ const grouped = groupBy(users, 'role');`,
                     </div>
                   </div>
 
-                  <p className="text-muted-foreground mb-2">@{userProfile.username}</p>
-                  <p className="mb-4 max-w-md">{userProfile.bio}</p>
+                  <p className="text-muted-foreground mb-2">@{user.username}</p>
+                  <p className="mb-4 max-w-md">{user.bio}</p>
 
                   {/* Stats */}
                   <div className="flex justify-center md:justify-start gap-6 mb-4">
                     <div className="text-center">
-                      <p className="font-bold text-lg">{userProfile.postsCount}</p>
+                      <p className="font-bold text-lg">{user.posts.length}</p>
                       <p className="text-sm text-muted-foreground">Posts</p>
                     </div>
                     <div className="text-center">
-                      <p className="font-bold text-lg">{userProfile.friendsCount}</p>
+                      <p className="font-bold text-lg">{user.friends.length}</p>
                       <p className="text-sm text-muted-foreground">Friends</p>
                     </div>
-                    <div className="text-center">
-                      <p className="font-bold text-lg">{userProfile.followersCount}</p>
-                      <p className="text-sm text-muted-foreground">Followers</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="font-bold text-lg">{userProfile.followingCount}</p>
-                      <p className="text-sm text-muted-foreground">Following</p>
-                    </div>
+                    
                   </div>
 
-                  <p className="text-sm text-muted-foreground">{userProfile.joined}</p>
+                  <p className="text-sm text-muted-foreground">{new Date(user.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
             </CardContent>
