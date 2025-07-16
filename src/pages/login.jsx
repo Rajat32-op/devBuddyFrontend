@@ -6,6 +6,7 @@ import { FadeInView } from '../components/Animations'
 
 function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
   const navigate = useNavigate()
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,11 +20,17 @@ function Login() {
       credentials:'include'
     })
     const result = await response.json();
-    if(result.message=="Login successful"){
-      navigate('/askForUsername',{state:{from:'login'}});
+    if(response.status===201){
+      navigate('/askForUsername',{state:{from:'Signup'}});
+    }
+    else if(response.status===200){
+      navigate('/');
     }
     else{
-      navigate('/signup');
+      setError(result.message || 'An error occurred during signup');
+      console.error(result);
+      setForm({ email: '', password: '' }); // Reset form on error
+      setTimeout(() => setError(''), 2000);
     }
   }
 
@@ -42,8 +49,14 @@ function Login() {
       credentials: "include"
     })
     const result = await response.json()
-    if (result.message == "Login successful") {
+    if (response.status === 200) {
       navigate('/')
+    }
+    else{
+      setError(result.message || 'An error occurred during login');
+      console.error(result);
+      setForm({ email: '', password: '' }); // Reset form on error
+      setTimeout(() => setError(''), 2000);
     }
   };
 
@@ -53,6 +66,11 @@ function Login() {
       <div className="bg-[url('/bg_login.png')] bg-center opacity-70 z-0 absolute inset-0"></div>
 
       {/* Foreground Form */}
+      {error && (
+  <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 bg-red-500 text-white px-4 py-2 rounded shadow-md transition-all duration-300">
+    {error}
+  </div>
+)}
       <FadeInView>
 
         <form onSubmit={handleSubmit} className=" bg-black/50 backdrop-blur-md relative p-6 rounded shadow w-96 z-10 ring-2 ring-black/10">
@@ -61,15 +79,17 @@ function Login() {
             type="text"
             name="username"
             placeholder="Username"
+            required
             onChange={handleChange}
-            className="text-white border p-2 w-full mb-2 rounded-2xl"
+            className=" border p-2 w-full mb-2 rounded-2xl"
           />
           <input
             type="password"
             name="password"
             placeholder="Password"
+            required
             onChange={handleChange}
-            className="text-white border p-2 w-full mb-4 rounded-2xl"
+            className=" border p-2 w-full mb-4 rounded-2xl"
           />
           <button
             type="submit"
