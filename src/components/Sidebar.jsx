@@ -3,22 +3,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { useNavigate } from "react-router-dom";
 import { div } from "framer-motion/client";
+import { getUser } from "../providers/getUser.jsx"; // Assuming this is the correct path to your user provider
 
-const Sidebar = ({user}) => {
-  const navigate = useNavigate()
+const Sidebar = () => {
+  const navigate = useNavigate();
+  const {user,setUser} = getUser(); 
   const activeFriends = [
     { name: "Alice Cooper", status: "online" },
     { name: "Bob Smith", status: "online" },
     { name: "Carol Johnson", status: "away" },
   ];
-  if(user===null || user===undefined){
-    return(<div className="min-h-screen bg-background text-foreground dark:bg-black dark:text-white">
-      
-      <div className="container mx-auto px-4 py-6">
-        <div className="max-w-4xl mx-auto text-center text-lg">Loading...</div>
-      </div>
-    </div>)
-  }
+  
   return (
     <div className="space-y-6">
       {/* User Profile */}
@@ -60,7 +55,7 @@ const Sidebar = ({user}) => {
             </button>
             <button  className="w-full flex items-center gap-2">
               <Users className="mr-2 h-5 w-5" />
-              Connections
+              Friends
             </button>
             <button onClick={()=>{navigate('/chat')}} className="w-full flex items-center gap-2">
               <MessageCircle className="mr-2 h-5 w-5" />
@@ -68,7 +63,7 @@ const Sidebar = ({user}) => {
             </button>
             <button className="w-full flex items-center gap-2">
               <Heart className="mr-2 h-5 w-5" />
-              Liked Posts
+              Notifications
             </button>
           </nav>
         </CardContent>

@@ -4,11 +4,12 @@ import { Card, CardContent } from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import Navbar from "../components/Navbar";
 import PostCard from "../components/PostCard";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { getUser } from "../providers/getUser.jsx";
 
 const Profile = () => {
   const navigate = useNavigate();
-  
+
   const [userPosts] = useState([
     {
       id: 1,
@@ -47,7 +48,7 @@ const Profile = () => {
         type: "image",
         text: "Beautiful sunset from my office window while debugging 🌅",
         imageUrl:
-        "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=500&h=300&fit=crop",
+          "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=500&h=300&fit=crop",
       },
       likes: 89,
       comments: 23,
@@ -77,53 +78,51 @@ const Profile = () => {
               
               // Usage
               const grouped = groupBy(users, 'role');`,
-              language: "javascript",
-            },
+        language: "javascript",
+      },
       likes: 34,
       comments: 8,
       timestamp: "1 week ago",
       tags: ["JavaScript", "Utilities", "Arrays"],
     },
   ]);
-
-  const [user, setUser] = useState(undefined);
+  const {user,setUser}= getUser();
   useEffect(() => {
-    const fetchUser = async () => {
-      const response = await fetch("http://localhost:3000/me", {
-        method: "GET",
-        credentials: "include"
-      });
-      if (response.ok) {
-        let tempuser = await response.json();
-        setUser(tempuser);
-      }
-      else{
-        setUser(null);
-      }
-    }
-    fetchUser();
-  }, []);
-  useEffect(() => {
-    if (user===null) {
+    if (user === null) {
       navigate("/login");
     }
-  }, [user,navigate]);
+  }, [user, navigate]);
 
-  if (user === undefined) {
-  // Still loading
-  return (
-    <div className="min-h-screen bg-background text-foreground dark:bg-black dark:text-white">
-      <Navbar />
-      <div className="container mx-auto px-4 py-6">
-        <div className="max-w-4xl mx-auto text-center text-lg">Loading...</div>
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/logout", {
+        method: "POST",
+        credentials: "include"
+      });
+      if (response.status === 200) {
+        setUser(null);
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
+
+  if (user === undefined || user === null) {
+    // Still loading
+    return (
+      <div className="min-h-screen bg-background text-foreground dark:bg-black dark:text-white">
+        <Navbar />
+        <div className="container mx-auto px-4 py-6">
+          <div className="max-w-4xl mx-auto text-center text-lg">Loading...</div>
+        </div>
       </div>
-    </div>
-  );
-}
-return (
-  
-  <div className="min-h-screen bg-background text-foreground dark:bg-black dark:text-white">
-      
+    );
+  }
+  return (
+
+    <div className="min-h-screen bg-background text-foreground dark:bg-black dark:text-white">
+
       <Navbar />
 
       <div className="container mx-auto px-4 py-6">
@@ -167,10 +166,11 @@ return (
                       <p className="font-bold text-lg">{user.friends.length}</p>
                       <p className="text-sm text-muted-foreground">Friends</p>
                     </div>
-                    
+
                   </div>
 
                   <p className="text-sm text-muted-foreground">{new Date(user.createdAt).toLocaleDateString()}</p>
+                  <button onClick={handleLogout} className="px-3 my-1 py-1 border rounded text-sm bg-red-600 hover:bg-red-500 font-bold">Logout</button>
                 </div>
               </div>
             </CardContent>

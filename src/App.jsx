@@ -7,6 +7,8 @@ import Login from './pages/login'
 import AskForUsername from './pages/AskForUsername'
 import Profile from './pages/Profile'
 import Chat from './pages/Chat'
+import Notifications from './pages/Notifications'
+import Navbar from './components/Navbar'
 
 function App() {
   
@@ -20,6 +22,7 @@ function App() {
             <Route path='/askForUsername' element={<AskForUsername/>}/>
             <Route path='/profile' element={<Profile/>}/>
             <Route path='/chat' element={<Chat/>}/>
+            <Route path='/notifications' element={<Notifications/>}/>
         </Routes>
       </BrowserRouter>
     </>

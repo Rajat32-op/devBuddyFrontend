@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { FadeInView } from '../components/Animations'
-
+import { getUser } from '../providers/getUser.jsx';
 
 function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
+  const { fetchUser } = getUser();
   const navigate = useNavigate()
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -24,6 +25,7 @@ function Login() {
       navigate('/askForUsername',{state:{from:'Signup'}});
     }
     else if(response.status===200){
+      fetchUser();
       navigate('/');
     }
     else{
@@ -50,6 +52,7 @@ function Login() {
     })
     const result = await response.json()
     if (response.status === 200) {
+      fetchUser();
       navigate('/')
     }
     else{

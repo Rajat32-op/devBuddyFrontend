@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import LetterGlitch from "../components/LetterGlitchBg";
 import {FadeInView,ScaleAndBlur} from '../components/Animations'
 import { useNavigate,useLocation } from "react-router-dom";
+import { getUser } from "../providers/getUser.jsx"; 
 
 const AskForUsername = () => {
   const [username, setUsername] = useState("");
 
   const location=useLocation();
   const navigate=useNavigate();
+  const {fetchUser} = getUser();
 
   useEffect(()=>{
     if(!location.state?.from){
@@ -26,6 +28,7 @@ const AskForUsername = () => {
     })
     res=await res.json()
     if(res.message==="Login successful"){
+      fetchUser();
       navigate('/')
     }
     else{
@@ -47,7 +50,7 @@ const AskForUsername = () => {
         <div className="flex flex-col gap-10 items-center">
         <ScaleAndBlur>
         <h1 className="text-7xl z-10 font-bold bg-black/60 backdrop-blur-lg shadow-white/10 drop-shadow-2xl rounded-2xl text-white mb-4 text-center">
-          Welcome To Devbuddy!
+          Welcome To Intellecta!
         </h1>
         </ScaleAndBlur>
       <FadeInView duration={0.7}>

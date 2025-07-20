@@ -87,31 +87,15 @@ clean_data = process_data(raw_input)`,
     }
   ]);
 
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const response = await fetch("http://localhost:3000/me", {
-        method: "GET",
-        credentials: "include"
-      });
-      if (response.ok) {
-        let tempuser = await response.json();
-        setUser(tempuser);
-      }
-    }
-    fetchUser();
-  }, []);
-
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-background text-white">
-      <Navbar user={user}/>
+      <Navbar />
 
       <div className="container max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <div className="lg:col-span-1 hidden lg:block">
-            <Sidebar user={user} />
+            <Sidebar />
           </div>
 
           {/* Main Feed */}

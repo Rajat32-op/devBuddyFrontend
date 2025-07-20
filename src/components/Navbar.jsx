@@ -4,7 +4,7 @@ import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import Sidebar from "./Sidebar";
 import { useNavigate } from "react-router-dom";
 
-const Navbar = ({user}) => {
+const Navbar = () => {
   const navigate=useNavigate()
   return (
     <nav className="border-b bg-zinc-900 text-white sticky z-50 backdrop-blur">
@@ -19,7 +19,7 @@ const Navbar = ({user}) => {
                 </button>
               </SheetTrigger>
               <SheetContent side="left" className="bg-zinc-900 text-white w-72">
-                <Sidebar user={user}/>
+                <Sidebar />
               </SheetContent>
             </Sheet>
 
@@ -39,7 +39,7 @@ const Navbar = ({user}) => {
 
           {/* Icons */}
           <div className="flex items-center space-x-4">
-            <button className="relative p-2 rounded hover:bg-zinc-800">
+            <button onClick={()=>{navigate('/notifications')}} className="relative p-2 rounded hover:bg-zinc-800">
               <Heart className="h-5 w-5 text-white" />
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                 3
