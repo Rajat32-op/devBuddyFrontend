@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { FadeInView } from '../components/Animations'
-import { getUser } from '../providers/getUser.jsx';
+import { useUser } from '../providers/getUser.jsx';
 
 function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
-  const { fetchUser } = getUser();
+  const { fetchUser } = useUser();
   const navigate = useNavigate()
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -43,7 +43,6 @@ function Login() {
       username: e.target.elements.username.value,
       password: e.target.elements.password.value
     }
-    console.log(data)
     const response = await fetch("http://localhost:3000/login", {
       method: 'POST',
       body: JSON.stringify(data),
@@ -52,7 +51,9 @@ function Login() {
     })
     const result = await response.json()
     if (response.status === 200) {
-      fetchUser();
+      setTimeout(() => {
+        fetchUser();
+      },100);
       navigate('/')
     }
     else{

@@ -3,11 +3,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { useNavigate } from "react-router-dom";
 import { div } from "framer-motion/client";
-import { getUser } from "../providers/getUser.jsx"; // Assuming this is the correct path to your user provider
+import { useUser } from "../providers/getUser.jsx"; // Assuming this is the correct path to your user provider
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const {user,setUser} = getUser(); 
+  const {user,fetchUser} = useUser(); 
+  
   const activeFriends = [
     { name: "Alice Cooper", status: "online" },
     { name: "Bob Smith", status: "online" },

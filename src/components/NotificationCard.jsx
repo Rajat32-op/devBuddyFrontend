@@ -85,9 +85,9 @@ export function NotificationCard({
     <Card
       className={`p-4 cursor-pointer dark:bg-none transition-all duration-200 border rounded-md ${
         !notification.isRead
-          ? 'bg-gray-800 border-l-4 border-blue-500'
-          : 'bg-gray-900 border-gray-700'
-      } hover:bg-gray-800`}
+          ? 'dark:bg-gray-800 border-l-4 border-blue-500'
+          : 'dark:bg-gray-900 border-gray-700'
+      } hover:dark:bg-gray-800`}
       onClick={handleCardClick}
     >
       <div className="flex items-start space-x-3">

@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import Navbar from "../components/Navbar";
 import PostCard from "../components/PostCard";
 import { useNavigate } from "react-router-dom";
-import { getUser } from "../providers/getUser.jsx";
+import { useUser } from "../providers/getUser.jsx";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -86,7 +86,7 @@ const Profile = () => {
       tags: ["JavaScript", "Utilities", "Arrays"],
     },
   ]);
-  const {user,setUser}= getUser();
+  const {user,setUser}= useUser();
   useEffect(() => {
     if (user === null) {
       navigate("/login");

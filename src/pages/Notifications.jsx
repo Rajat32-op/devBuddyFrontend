@@ -2,75 +2,16 @@ import { useState } from "react";
 import { Bell, Check, Settings } from "lucide-react";
 import { NotificationCard } from "../components/NotificationCard";
 import Navbar from "../components/Navbar";
+import { useUser } from "../providers/getUser";
 
 const avatar1 = "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face";
 const avatar2 = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face";
 const avatar3 = "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face";
 const avatar4 = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
 
-const initialNotifications = [
-  {
-    id: "1",
-    type: "friend_request",
-    user: {
-      name: "Sarah Johnson",
-      avatar: avatar1,
-      username: "sarah.j"
-    },
-    timestamp: "2 minutes ago",
-    isRead: false
-  },
-  {
-    id: "2",
-    type: "like",
-    user: {
-      name: "Alex Chen",
-      avatar: avatar2,
-      username: "alex.chen"
-    },
-    content: "Beautiful sunset at the beach! 🌅",
-    timestamp: "1 hour ago",
-    isRead: false
-  },
-  {
-    id: "3",
-    type: "like",
-    user: {
-      name: "Maya Patel",
-      avatar: avatar3,
-      username: "maya.p"
-    },
-    content: "Just finished my morning workout!",
-    timestamp: "3 hours ago",
-    isRead: true
-  },
-  {
-    id: "4",
-    type: "friend_request",
-    user: {
-      name: "David Wilson",
-      avatar: avatar4,
-      username: "david.w"
-    },
-    timestamp: "1 day ago",
-    isRead: true
-  },
-  {
-    id: "5",
-    type: "like",
-    user: {
-      name: "Sarah Johnson",
-      avatar: avatar1,
-      username: "sarah.j"
-    },
-    content: "Coffee and coding session ☕",
-    timestamp: "2 days ago",
-    isRead: true
-  }
-];
-
 export default function Notifications() {
-  const [notifications, setNotifications] = useState(initialNotifications);
+  const {user} = useUser();
+  const [notifications, setNotifications] = useState(user.notifications||[]);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 

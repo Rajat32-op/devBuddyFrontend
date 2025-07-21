@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import LetterGlitch from "../components/LetterGlitchBg";
 import {FadeInView,ScaleAndBlur} from '../components/Animations'
 import { useNavigate,useLocation } from "react-router-dom";
-import { getUser } from "../providers/getUser.jsx"; 
+import { useUser } from "../providers/getUser.jsx"; 
 
 const AskForUsername = () => {
   const [username, setUsername] = useState("");
 
   const location=useLocation();
   const navigate=useNavigate();
-  const {fetchUser} = getUser();
+  const {fetchUser} = useUser();
 
   useEffect(()=>{
     if(!location.state?.from){

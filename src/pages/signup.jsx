@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { FadeInView } from '../components/Animations'
-import { getUser } from '../providers/getUser.jsx';
+import { useUser } from '../providers/getUser.jsx';
 
 function Signup() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
-  const { fetchUser } = getUser();
+  const { fetchUser } = useUser();
   const navigate = useNavigate();
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -38,7 +38,6 @@ function Signup() {
       email: e.target.elements.email.value,
       password: e.target.elements.password.value
     }
-    console.log(data)
     const response = await fetch("http://localhost:3000/signup", {
       method: 'POST',
       credentials: "include",
@@ -47,7 +46,9 @@ function Signup() {
     })
     const result = await response.json()
     if (response.status === 200) {
-      fetchUser();
+      setTimeout(() => {
+        fetchUser();
+      },100);
       navigate('/')
     }
     else{
