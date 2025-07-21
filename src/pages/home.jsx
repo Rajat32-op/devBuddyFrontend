@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Heart, MessageCircle, User } from "lucide-react";
+import { User } from "lucide-react";
 
 import { Card, CardContent, CardHeader } from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import PostCard from "../components/PostCard";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
-import { FadeInView } from "../components/Animations";
+import ScrollToTopButton from "../components/ScrollToTop";
 
 const Home = () => {
   const [posts] = useState([
@@ -86,12 +86,53 @@ clean_data = process_data(raw_input)`,
       tags: ["Python", "DataProcessing"]
     }
   ]);
+  const [error,setError]=useState(null);
+  const [message,setMessage]=useState(null);
+  const handleNewPost = async (e) => {
+    e.preventDefault();
+    const newpost={
+      caption:e.target.elements.caption.value,
+      image:e.target.elements.image.value||'',
+      codeSnippet:e.target.elements.codeSnippet.value||''
+    }
+    try{
+      const response=await fetch('http://localhost:3000/add-post',{
+        method:'POST',
+        credentials:'include',
+        body:JSON.stringify(newpost),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if(response.status!=200){
+        setError('could not create post');
+        setTimeout(()=>{setError(null)},3000);
+      }
+      else{
+        setMessage('Posted successfully');
+        e.target.elements.caption.value="";
+        setTimeout(()=>{setMessage(null)},3000);
+      }
+    }
+    catch(err){
+      console.log(err);
+      setError('could not create post');
+        setTimeout(()=>{setError(null)},2000);
+    }
+  }
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-background text-white">
       <Navbar />
-
-      <div className="container max-w-7xl mx-auto px-4 py-6">
+      {error && (
+  <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 bg-red-500 text-white px-4 py-2 rounded shadow-md transition-all duration-300">
+    {error}
+  </div>
+)}
+      {message && (
+  <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 bg-green-500 text-white px-4 py-2 rounded shadow-md transition-all duration-300">
+    {message}
+  </div>
+)}
+      <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <div className="lg:col-span-1 hidden lg:block">
@@ -99,7 +140,7 @@ clean_data = process_data(raw_input)`,
           </div>
 
           {/* Main Feed */}
-          <div className="col-span-1 lg:col-span-2 space-y-6">
+          <form onSubmit={handleNewPost} className="col-span-1 lg:col-span-2 space-y-6">
             {/* Create Post */}
             <Card>
               <CardHeader>
@@ -111,6 +152,8 @@ clean_data = process_data(raw_input)`,
                     </AvatarFallback>
                   </Avatar>
                   <textarea
+                  name="caption"
+                  required
                     placeholder="Share your code or thoughts with the community..."
                     className="flex-1 min-h-[60px] resize-none bg-transparent border border-zinc-500 rounded px-3 py-2 text-white"
                   />
@@ -119,10 +162,12 @@ clean_data = process_data(raw_input)`,
               <CardContent>
                 <div className="flex justify-between items-center">
                   <div className="flex space-x-2">
-                    <button className="px-3 py-1 text-sm border border-zinc-500 rounded hover:bg-zinc-800">📷 Image</button>
-                    <button className="px-3 py-1 text-sm border border-zinc-500 rounded hover:bg-zinc-800">💻 Code</button>
+                    <input type='file' id="image" name="image" className="hidden"/>
+                    <label htmlFor="image" className="px-3 py-1 text-sm border border-zinc-500 rounded hover:bg-zinc-800">📷 Image</label>
+                    <input type='file' id="codeSnippet" name="codeSnippet" className="hidden"/>
+                    <label htmlFor="codeSnippet" className="px-3 py-1 text-sm border border-zinc-500 rounded hover:bg-zinc-800">💻 Code</label>
                   </div>
-                  <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded">
+                  <button type="submit" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded">
                     Post
                   </button>
                 </div>
@@ -135,7 +180,7 @@ clean_data = process_data(raw_input)`,
                 <PostCard key={post.id} post={post} />
               ))}
             </div>
-          </div>
+          </form>
 
           {/* Right Sidebar */}
           <div className="lg:col-span-1 hidden lg:block">
@@ -194,6 +239,7 @@ clean_data = process_data(raw_input)`,
           </div>
         </div>
       </div>
+      <ScrollToTopButton />
     </div>
   );
 };

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 const Navbar = () => {
   const navigate=useNavigate()
   return (
-    <nav className="border-b bg-zinc-900 text-white sticky z-50 backdrop-blur">
+    <nav className="border-b bg-zinc-900 text-white sticky z-20 backdrop-blur">
       <div className="mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Mobile Sidebar Button & Logo */}
