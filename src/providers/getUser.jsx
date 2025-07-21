@@ -5,6 +5,7 @@ export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     async function fetchUser() {
+        setUser(undefined);
         try {
             const response = await fetch("http://localhost:3000/me", {
                 method: "GET",
