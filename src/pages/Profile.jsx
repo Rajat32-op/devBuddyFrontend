@@ -10,83 +10,21 @@ import { useUser } from "../providers/getUser.jsx";
 const Profile = () => {
   const navigate = useNavigate();
 
-  const [userPosts] = useState([
-    {
-      id: 1,
-      user: {
-        name: "John Developer",
-        username: "johndev",
-        avatar: "/placeholder.svg",
-      },
-      content: {
-        type: "code",
-        text: "Working on a new authentication system with JWT tokens",
-        code: `const authenticateUser = async (token) => {
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-    return user;
-    } catch (error) {
-    throw new Error('Invalid token');
-  }
-};`,
-        language: "javascript",
-      },
-      likes: 42,
-      comments: 15,
-      timestamp: "1 day ago",
-      tags: ["JavaScript", "Authentication", "JWT"],
-    },
-    {
-      id: 2,
-      user: {
-        name: "John Developer",
-        username: "johndev",
-        avatar: "/placeholder.svg",
-      },
-      content: {
-        type: "image",
-        text: "Beautiful sunset from my office window while debugging 🌅",
-        imageUrl:
-          "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=500&h=300&fit=crop",
-      },
-      likes: 89,
-      comments: 23,
-      timestamp: "3 days ago",
-      tags: ["Life", "Coding", "Sunset"],
-    },
-    {
-      id: 3,
-      user: {
-        name: "John Developer",
-        username: "johndev",
-        avatar: "/placeholder.svg",
-      },
-      content: {
-        type: "code",
-        text: "Quick utility function for array manipulation",
-        code: `const groupBy = (array, key) => {
-          return array.reduce((result, item) => {
-            const group = item[key];
-            if (!result[group]) {
-              result[group] = [];
-              }
-              result[group].push(item);
-              return result;
-              }, {});
-              };
-              
-              // Usage
-              const grouped = groupBy(users, 'role');`,
-        language: "javascript",
-      },
-      likes: 34,
-      comments: 8,
-      timestamp: "1 week ago",
-      tags: ["JavaScript", "Utilities", "Arrays"],
-    },
-  ]);
   const {user,setUser}= useUser();
+  const [userPosts,setUserPosts]=useState([]);
+  useEffect(()=>{
+    const fetchPosts=async ()=>{
+      const response=await fetch(`http://localhost:3000/get-posts?userId=${user._id}`,{
+      method:'GET',
+      credentials:'include',
+      headers:{'Content-Type':'application/json'}
+    });
+    const data=await response.json();
+    setUserPosts(data);
+  }
+  fetchPosts();
+},[])
+  
   useEffect(() => {
     if (user === null) {
       navigate("/login");
@@ -159,7 +97,7 @@ const Profile = () => {
                   {/* Stats */}
                   <div className="flex justify-center md:justify-start gap-6 mb-4">
                     <div className="text-center">
-                      <p className="font-bold text-lg">{user.posts.length}</p>
+                      <p className="font-bold text-lg">{userPosts.length}</p>
                       <p className="text-sm text-muted-foreground">Posts</p>
                     </div>
                     <div className="text-center">
@@ -190,7 +128,7 @@ const Profile = () => {
             {/* User Posts */}
             <div className="space-y-6">
               {userPosts.map((post) => (
-                <PostCard key={post.id} post={post} />
+                <PostCard key={post._id} post={post} />
               ))}
             </div>
           </div>

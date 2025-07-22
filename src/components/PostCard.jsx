@@ -5,6 +5,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import CodeBlock from "./CodeBlock";
 
 const PostCard = ({ post }) => {
+  function timeAgo(date) {
+  const now = Date.now();
+  const postTime = new Date(date).getTime(); // supports both Date and ISO string
+  const diff = now - postTime;
+
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(diff / (1000 * 60));
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+  if (seconds < 60) return `${seconds} seconds ago`;
+  if (minutes < 60) return `${minutes} minutes ago`;
+  if (hours < 24) return `${hours} hours ago`;
+  if (days < 7) return `${days} days ago`;
+
+  return new Date(date).toLocaleDateString(); // fallback: show actual date
+}
   const [isLiked, setIsLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
@@ -27,15 +44,15 @@ const PostCard = ({ post }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Avatar>
-              <AvatarImage src={post.user.avatar} />
+              <AvatarImage src={post.profilePicture||''} />
               <AvatarFallback>
                 <User className="h-4 w-4" />
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-semibold">{post.user.name}</p>
+              <p className="font-semibold">{post.username}</p>
               <p className="text-sm text-muted-foreground dark:text-zinc-400">
-                @{post.user.username} • {post.timestamp}
+                @{post.username} • {timeAgo(post.createdAt)}
               </p>
             </div>
           </div>
@@ -48,16 +65,16 @@ const PostCard = ({ post }) => {
       <CardContent className="space-y-4">
         {/* Post Content */}
         <div>
-          <p className="mb-3 text-zinc-800 dark:text-zinc-200">{post.content.text}</p>
+          <p className="mb-3 text-zinc-800 dark:text-zinc-200">{post.caption}</p>
 
-          {post.content.type === "code" && post.content.code && (
+          {post.codeSnippet !== "" && (
             <CodeBlock
               code={post.content.code}
               language={post.content.language || "javascript"}
             />
           )}
 
-          {post.content.type === "image" && post.content.imageUrl && (
+          {post.image !== "" && (
             <div className="rounded-lg overflow-hidden">
               <img
                 src={post.content.imageUrl}
@@ -92,7 +109,7 @@ const PostCard = ({ post }) => {
               onClick={() => setShowComments(!showComments)}
             >
               <MessageCircle className="mr-1 h-4 w-4" />
-              {post.comments}
+              comments
             </button>
           </div>
         </div>
