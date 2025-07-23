@@ -10,8 +10,17 @@ const avatar3 = "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=
 const avatar4 = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
 
 export default function Notifications() {
-  const {user} = useUser();
+  const {user,loading} = useUser();
+  if(loading){
+    return (
+      <div className="flex justify-center h-full gap-2 min-h-[200px ]">
+        <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></span>
+        <span className="text-lg text-black">Loading  ...</span>
+      </div>
+    );
+  }
   const [notifications, setNotifications] = useState(user.notifications||[]);
+
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 

@@ -10,7 +10,7 @@ import { useUser } from "../providers/getUser.jsx";
 const Profile = () => {
   const navigate = useNavigate();
 
-  const {user,setUser}= useUser();
+  const {user,setUser,loading}= useUser();
   const [userPosts,setUserPosts]=useState([]);
   useEffect(()=>{
     const fetchPosts=async ()=>{
@@ -26,7 +26,7 @@ const Profile = () => {
 },[])
   
   useEffect(() => {
-    if (user === null) {
+    if (!loading && user === null) {
       navigate("/login");
     }
   }, [user, navigate]);

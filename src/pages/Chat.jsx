@@ -13,8 +13,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../components/ui/command";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../components/ui/alert-dialog";
 import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../providers/getUser.jsx"; 
 
 const Chat = () => {
+
+  const {user,loading} = useUser();
+  if(loading){
+    return (
+      <div className="flex justify-center h-full gap-2 min-h-[200px]">
+        <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></span>
+        <span className="text-lg text-black">Loading...</span>
+      </div>
+    );
+  }
+  const navigate = useNavigate();
+
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedChat, setSelectedChat] = useState(null);

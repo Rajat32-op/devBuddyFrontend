@@ -7,14 +7,14 @@ import { useUser } from "../providers/getUser.jsx"; // Assuming this is the corr
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const {user} = useUser(); 
+  const {user,loading} = useUser(); 
   
   const activeFriends = [
     { name: "Alice Cooper", status: "online" },
     { name: "Bob Smith", status: "online" },
     { name: "Carol Johnson", status: "away" },
   ];
-  if(user===undefined){
+  if(loading){
     return(
       <div className="flex justify-center h-full gap-2 min-h-[200px]">
         <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></span>
