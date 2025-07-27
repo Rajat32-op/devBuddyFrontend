@@ -1,5 +1,6 @@
 import {Prism}from "react-syntax-highlighter";
-import { oneDark} from 'react-syntax-highlighter/dist/esm/styles/prism';
+// import { dracula } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { dracula} from 'react-syntax-highlighter/dist/esm/styles/prism';
 const CodeBlock = ({ code, language }) => {
   const getLanguageColor = (lang) => {
     const colors = {
@@ -28,7 +29,7 @@ const CodeBlock = ({ code, language }) => {
       {/* Code content */}
       <div className="p-4 overflow-x-auto">
         <pre className="text-sm ">
-          <Prism language={language} style={oneDark}>
+          <Prism language={language} style={dracula}>
             {/* syntax highlighting */}
             {code}
           </Prism>

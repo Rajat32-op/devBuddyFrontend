@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import { User } from "lucide-react";
 
 import { Card, CardContent, CardHeader } from "../components/ui/card";
@@ -8,6 +8,8 @@ import PostCard from "../components/PostCard";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import ScrollToTopButton from "../components/ScrollToTop";
+
+import { useUser } from "../providers/getUser.jsx";
 
 const Home = () => {
   const [posts] = useState([
@@ -119,6 +121,9 @@ clean_data = process_data(raw_input)`,
     }
   }
 
+  const { user, loading } = useUser();
+  
+
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-background text-white">
       <Navbar />
@@ -156,16 +161,17 @@ clean_data = process_data(raw_input)`,
                   required
                     placeholder="Share your code or thoughts with the community..."
                     className="flex-1 min-h-[60px] resize-none bg-transparent border border-zinc-500 rounded px-3 py-2 text-white"
+                    
                   />
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="flex justify-between items-center">
                   <div className="flex space-x-2">
-                    <input type='file' id="image" name="image" className="hidden"/>
-                    <label htmlFor="image" className="px-3 py-1 text-sm border border-zinc-500 rounded hover:bg-zinc-800">📷 Image</label>
+                    <input type='file' id="image" name="image" accept="image/png, image/jpeg" className="hidden"/>
+                    <label htmlFor="image" className="px-3 py-1 text-sm border border-zinc-500 rounded bg-zinc-800">📷 Image</label>
                     <input type='file' id="codeSnippet" name="codeSnippet" className="hidden"/>
-                    <label htmlFor="codeSnippet" className="px-3 py-1 text-sm border border-zinc-500 rounded hover:bg-zinc-800">💻 Code</label>
+                    <label htmlFor="codeSnippet" className="px-3 py-1 text-sm border border-zinc-500 rounded bg-zinc-800">💻 Code</label>
                   </div>
                   <button type="submit" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded">
                     Post

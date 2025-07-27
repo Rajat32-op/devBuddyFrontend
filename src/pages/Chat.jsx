@@ -199,7 +199,7 @@ const Chat = () => {
           </div>
 
           {/* Right */}
-          <div className={`${!showChatList ? 'block' : 'hidden'} lg:block flex-1 flex flex-col`}>
+          <div className={`${!showChatList ? 'block' : 'hidden'} lg:block flex-1 flex flex-col bg-gradient-to-br from-[#0d0f1c] via-[#111222] to-[#090b17]`}>
             {selectedChat ? (
               <div className="flex flex-col h-full">
                 <div className="p-4 border-b border-zinc-800 flex items-center gap-3">
@@ -257,8 +257,9 @@ const Chat = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex-1 h-full flex items-center justify-center">
-                <div className="text-center">
+              <div className="flex-1 h-full flex items-center justify-center  bg-gradient-to-br from-[#0d0f1c] via-[#111222] to-[#090b17] relative">
+                  <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-[600px] h-[600px] bg-[#3b82f680] opacity-20 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="text-center relative z-10">
                   <MessageCircle className="h-16 w-16 text-zinc-500 mx-auto mb-4" />
                   <h3 className="text-xl font-medium mb-2">Select a conversation</h3>
                   <p className="text-zinc-400">Choose or start a conversation</p>

@@ -3,9 +3,27 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import Sidebar from "./Sidebar";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import { debounce } from "lodash";
+import { useUser } from "../providers/getUser.jsx";
 
 const Navbar = () => {
   const navigate=useNavigate()
+
+  const [query, setQuery] = useState("");
+
+  const handleSearch=useCallback(debounce(async(searchName)=>{
+    const response=await fetch(`http://localhost:3000/search?query=${searchName}`); 
+    if(response.status===200){
+      const data=await response.json();
+      console.log("Search results:", data);
+    }
+  },800),[]);
+
+  useEffect(() => {
+    if (query) handleSearch(query);
+  }, [query]);
+
   return (
     <nav className="border-b bg-zinc-900 text-white sticky z-20 backdrop-blur">
       <div className="mx-auto px-4">
@@ -34,6 +52,9 @@ const Navbar = () => {
               type="text"
               placeholder="Search developers, posts, or tags..."
               className="w-full px-4 py-2 border border-zinc-700 rounded-full bg-zinc-800 text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              onChange={(e) => {
+                      setQuery(e.target.value);
+              }}
             />
           </div>
 

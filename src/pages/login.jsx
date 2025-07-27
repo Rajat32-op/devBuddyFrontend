@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { FadeInView } from '../components/Animations'
 import { useUser } from '../providers/getUser.jsx';
+import {User,Lock}from "lucide-react";
 
 function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -67,7 +68,7 @@ function Login() {
   return (
     <div className="min-h-screen flex justify-center items-center relative">
       {/* Background Image with opacity */}
-      <div className="bg-[url('/bg_login.png')] bg-center opacity-70 z-0 absolute inset-0"></div>
+      <div className="bg-[url('/bg_login.png')] bg-center z-0 absolute inset-0"></div>
 
       {/* Foreground Form */}
       {error && (
@@ -77,28 +78,37 @@ function Login() {
 )}
       <FadeInView>
 
-        <form onSubmit={handleSubmit} className=" bg-black/50 backdrop-blur-md relative p-6 rounded shadow w-96 z-10 ring-2 ring-black/10">
+        <form onSubmit={handleSubmit} className=" bg-gradient-to-br from-[#0a3c3d] via-[#0d4748] to-[#0f4f50] relative p-6 rounded shadow w-96 z-10 ring-2 ring-black/10">
           <h2 className="text-2xl text-white font-bold mb-4">Log In</h2>
+          <div className='flex flex-col gap-2 rounded-full'>
+
+          <div className='flex gap-2 rounded-full'>
+          <User className="w-10 h-10 text-white mb-2" />
           <input
             type="text"
             name="username"
             placeholder="Username"
             required
             onChange={handleChange}
-            className=" border p-2 w-full mb-2 rounded-2xl"
-          />
+            className="bg-transparent border p-2 text-gray-300 outline-none w-full font-bold mb-2 rounded-2xl"
+            />
+            </div>
+            <div className='flex gap-2 rounded-full'>
           <input
             type="password"
             name="password"
             placeholder="Password"
             required
             onChange={handleChange}
-            className=" border p-2 w-full mb-4 rounded-2xl"
-          />
+            className=" border p-2 bg-transparent text-gray-300 w-full mb-4 font-bold rounded-2xl"
+            />
+              <Lock className="w-10 h-10 text-white mb-2" />
+          </div>
+          </div>
           <button
             type="submit"
             className="bg-blue-600 hover:bg-blue-500 my-2 cursor-pointer text-white py-2 px-4 rounded w-full"
-          >
+            >
             Log In
           </button>
           <GoogleOAuthProvider clientId="215751656376-24vomoq01h0qhlodv3h7qc3u2rjiiidv.apps.googleusercontent.com">

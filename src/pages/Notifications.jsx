@@ -27,7 +27,7 @@ export default function Notifications() {
   const handleMarkAsRead = (id) => {
     setNotifications(prev =>
       prev.map(notification =>
-        notification.id === id
+        notification._id === id
           ? { ...notification, isRead: true }
           : notification
       )
