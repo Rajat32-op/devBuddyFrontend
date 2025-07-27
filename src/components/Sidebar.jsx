@@ -69,7 +69,7 @@ const Sidebar = () => {
               <MessageCircle className="mr-2 h-5 w-5" />
               Messages
             </button>
-            <button className="w-full flex items-center gap-2">
+            <button onClick={()=>{navigate('/notifications')}} className="w-full flex items-center gap-2">
               <Heart className="mr-2 h-5 w-5" />
               Notifications
             </button>
