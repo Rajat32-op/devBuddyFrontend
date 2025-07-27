@@ -1,5 +1,7 @@
 // components/FadeInView.jsx
 import { motion } from "framer-motion";
+import { div } from "framer-motion/client";
+import { useEffect ,useState} from "react";
 import { useInView } from "react-intersection-observer";
 
 export const FadeInView = ({
@@ -54,4 +56,34 @@ export const ScaleAndBlur = ({
       {children}
     </motion.div>
   );
+
 };
+
+export const ZoominIcon=(({children})=>{
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000); 
+
+    return () => clearTimeout(timer);
+  }, []);
+  if(isLoading){
+
+    return (
+      <div className="flex justify-center items-center bg-gray-600 min-h-screen">
+      <motion.img
+      src="/icon.png"
+      alt="logo"
+      className="h-1/3 w-1/3"
+      initial={{ scale: 0.5, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 2, delay: 0.2 }}
+      whileHover={{ scale: 1.1 }}
+      />
+      </div>
+    );
+  }
+  return children
+})

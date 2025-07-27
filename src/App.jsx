@@ -9,11 +9,14 @@ import Profile from './pages/Profile'
 import Chat from './pages/Chat'
 import Notifications from './pages/Notifications'
 import Navbar from './components/Navbar'
+import { ZoominIcon } from './components/Animations'
 
 function App() {
   
   return (
     <>
+      <ZoominIcon>
+
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home/>}></Route>
@@ -25,6 +28,7 @@ function App() {
             <Route path='/notifications' element={<Notifications/>}/>
         </Routes>
       </BrowserRouter>
+      </ZoominIcon>
     </>
   )
 }
