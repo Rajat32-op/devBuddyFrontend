@@ -72,7 +72,7 @@ export const ZoominIcon=(({children})=>{
   if(isLoading){
 
     return (
-      <div className="flex justify-center items-center bg-gray-600 min-h-screen">
+      <div className="flex justify-center items-center bg-gradient-to-b from-[#0b1e1e] via-[#043f43] to-[#041b1b] min-h-screen">
       <motion.img
       src="/icon.png"
       alt="logo"
