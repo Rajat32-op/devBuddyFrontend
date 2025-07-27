@@ -1,6 +1,7 @@
 import { Heart, UserPlus, Clock ,Trash} from "lucide-react";
 import { Card } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import placeholderImage from "../assets/placeholder.png";
 
 export function NotificationCard({ 
   notification, 
@@ -10,7 +11,7 @@ export function NotificationCard({
 }) {
   const handleCardClick = () => {
     if (!notification.isRead) {
-      onMarkAsRead(notification.id);
+      onMarkAsRead(notification._id);
     }
   };
 
@@ -25,12 +26,10 @@ export function NotificationCard({
             <div className="flex space-x-4 min-w-0">
               <p className="text-sm">
                 <span className="font-semibold text-white">
-                  {notification.user.name}
+                  {notification.sentBy}
                 </span>
                 <span className="text-gray-400"> liked your post</span>
-                {notification.content && (
-                  <span className="text-gray-400">: "{notification.content}"</span>
-                )}
+                
               </p>
               <button>
                 <Trash className="w-4 h-4 text-gray-400 hover:text-red-500" />
@@ -48,7 +47,7 @@ export function NotificationCard({
             <div className="flex-1 min-w-0">
               <p className="text-sm">
                 <span className="font-semibold text-white">
-                  {notification.user.name}
+                  {notification.sentBy}
                 </span>
                 <span className="text-gray-400"> sent you a friend request</span>
               </p>
@@ -57,7 +56,7 @@ export function NotificationCard({
                   className="text-sm px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onAcceptFriend?.(notification.id);
+                    onAcceptFriend?.(notification._id);
                   }}
                 >
                   Accept
@@ -66,7 +65,7 @@ export function NotificationCard({
                   className="text-sm px-3 py-1 border border-gray-500 text-gray-300 rounded hover:bg-gray-700"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDeclineFriend?.(notification.id);
+                    onDeclineFriend?.(notification._id);
                   }}
                 >
                   Decline
@@ -93,11 +92,11 @@ export function NotificationCard({
       <div className="flex items-start space-x-3">
         <Avatar className="w-12 h-12 flex-shrink-0">
           <AvatarImage 
-            src={notification.user.avatar} 
-            alt={notification.user.name}
+            src={notification.sentByAvatar||placeholderImage} 
+            alt={notification.sentBy}
           />
           <AvatarFallback>
-            {notification.user.name.split(' ').map(n => n[0]).join('')}
+            {notification.sentBy.split(' ').map(n => n[0]).join('')}
           </AvatarFallback>
         </Avatar>
 
@@ -106,7 +105,7 @@ export function NotificationCard({
           
           <div className="flex items-center mt-2 text-xs text-gray-300">
             <Clock className="w-3 h-3 mr-1" />
-            {notification.timestamp}
+            {notification.timestamp.t}
           </div>
         </div>
 

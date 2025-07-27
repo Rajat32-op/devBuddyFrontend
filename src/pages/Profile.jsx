@@ -22,8 +22,8 @@ const Profile = () => {
     const data=await response.json();
     setUserPosts(data);
   }
-  fetchPosts();
-},[])
+  if (!loading && user) fetchPosts();
+},[user,loading])
   
   useEffect(() => {
     if (!loading && user === null) {
@@ -46,7 +46,7 @@ const Profile = () => {
     }
   };
 
-  if (user === undefined || user === null) {
+  if (loading) {
     // Still loading
     return (
       <div className="min-h-screen bg-background text-foreground dark:bg-black dark:text-white">

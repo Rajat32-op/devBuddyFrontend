@@ -42,18 +42,16 @@ export default function Notifications() {
   };
 
   const handleAcceptFriend = (id) => {
-    const notification = notifications.find(n => n.id === id);
+    const notification = notifications.find(n => n._id === id);
     if (notification) {
-      console.log(`Friend request accepted: ${notification.user.name}`);
-      setNotifications(prev => prev.filter(n => n.id !== id));
+      setNotifications(prev => prev.filter(n => n._id !== id));
     }
   };
 
   const handleDeclineFriend = (id) => {
-    const notification = notifications.find(n => n.id === id);
+    const notification = notifications.find(n => n._id === id);
     if (notification) {
-      console.log(`Friend request declined: ${notification.user.name}`);
-      setNotifications(prev => prev.filter(n => n.id !== id));
+      setNotifications(prev => prev.filter(n => n._id !== id));
     }
   };
 
@@ -105,7 +103,7 @@ export default function Notifications() {
           ) : (
             notifications.map((notification) => (
               <NotificationCard
-                key={notification.id}
+                key={notification._id}
                 notification={notification}
                 onMarkAsRead={handleMarkAsRead}
                 onAcceptFriend={handleAcceptFriend}
