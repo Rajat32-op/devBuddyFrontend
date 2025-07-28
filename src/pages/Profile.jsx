@@ -66,7 +66,7 @@ const Profile = () => {
       <div className="container mx-auto px-4 py-6">
         <div className="max-w-4xl mx-auto">
           {/* Profile Header */}
-          <Card className="mb-6">
+          <Card className="mb-6 dark:bg-gradient-to-br from-[#1a3760] via-[#4b5f7e] to-[#c9d1db]">
             <CardContent className="pt-6">
               <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                 {/* Profile Picture */}

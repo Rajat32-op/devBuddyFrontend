@@ -39,7 +39,7 @@ const PostCard = ({ post }) => {
     }
   };
   return (
-    <Card className="w-full bg-white dark:bg-zinc-900 text-black dark:text-white border border-zinc-300 dark:border-zinc-700">
+    <Card className="w-full bg-white dark:bg-gradient-to-br from-[#1a3760] via-[#4b5f7e] to-[#c9d1db] text-black dark:text-white border border-zinc-300 dark:border-zinc-700">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
