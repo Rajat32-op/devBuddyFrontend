@@ -8,7 +8,7 @@ import AskForUsername from './pages/AskForUsername'
 import Profile from './pages/Profile'
 import Chat from './pages/Chat'
 import Notifications from './pages/Notifications'
-import Navbar from './components/Navbar'
+import UpdateProfile from './pages/UpdateProfile'
 import { ZoominIcon } from './components/Animations'
 
 function App() {
@@ -24,6 +24,7 @@ function App() {
             <Route path='/signup' element={<Signup/>}/>
             <Route path='/askForUsername' element={<AskForUsername/>}/>
             <Route path='/profile' element={<Profile/>}/>
+            <Route path='/update-profile' element={<UpdateProfile/>}/>
             <Route path='/chat' element={<Chat/>}/>
             <Route path='/notifications' element={<Notifications/>}/>
         </Routes>

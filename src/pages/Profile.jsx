@@ -73,7 +73,11 @@ const Profile = () => {
                 <Avatar className="h-32 w-32 md:h-40 md:w-40">
                   <AvatarImage src={'/placeholder.svg'} />
                   <AvatarFallback className="text-2xl">
-                    <User className="h-16 w-16" />
+                    {user.profilePicture !==""? (
+                      <img src={user.profilePicture} alt="Profile" className="h-full w-full object-cover" />
+                    ) : (
+                      <User className="h-16 w-16" />
+                    )}
                   </AvatarFallback>
                 </Avatar>
 
@@ -82,7 +86,7 @@ const Profile = () => {
                   <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
                     <h1 className="text-2xl font-bold">{user.name}</h1>
                     <div className="flex gap-2 justify-center">
-                      <button className="px-3 py-1 border rounded text-sm">
+                      <button onClick={()=>{navigate('/update-profile')}} className="px-3 py-1 border rounded text-sm">
                         Edit Profile
                       </button>
                       <button className="px-3 py-1 border rounded text-sm">
