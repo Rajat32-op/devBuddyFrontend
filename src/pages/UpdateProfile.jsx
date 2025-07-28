@@ -45,18 +45,18 @@ const UpdateProfile = () => {
         )
     }
     return (
-        <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-b from-[#0b1e1e] via-[#043f43] to-[#041b1b] dark:text-white">
+        <div className="min-h-screen bg-background text-foreground bg-[url('bg_update_profile.png')] shadow-2xl dark:text-white">
             <Navbar />
-            <div className="container mx-auto px-4 py-6">
-                <div className="max-w-4xl mx-auto">
-                    <h1 className="text-2xl font-bold mb-4">Update Profile</h1>
+            <div className="container mx-auto z-10 px-4 py-6">
+                <div className="max-w-4xl mx-auto text-white">
+                    <h1 className="text-2xl text-white font-bold mb-4">Update Profile</h1>
                     <form onSubmit={handleUpdate} className="space-y-4" encType="multipart/form-datad">
                         <div>
-                            <label className="block text-sm font-medium mb-2">Name</label>
+                            <label className="block text-sm text-wihte font-medium mb-2">Name</label>
 
                             <input
                                 type="text"
-                                className="w-full bg-transparent px-3 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full bg-transparent text-wihte px-3 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Enter your name"
                                 name="name"
                                 value={name}
@@ -65,10 +65,10 @@ const UpdateProfile = () => {
 
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-2">Username</label>
+                            <label className="block text-sm text-wihte font-medium mb-2">Username</label>
                             <input
                                 type="text"
-                                className="w-full bg-transparent px-3 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full bg-transparent text-wihte px-3 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Enter your username"
                                 name="username"
                                 value={username}
@@ -76,9 +76,9 @@ const UpdateProfile = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-2">Bio</label>
+                            <label className="block text-sm text-wihte font-medium mb-2">Bio</label>
                             <textarea
-                                className="w-full bg-transparent px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full bg-transparent text-wihte px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Tell us about yourself"
                                 rows="4"
                                 name="bio"
@@ -87,10 +87,10 @@ const UpdateProfile = () => {
                             ></textarea>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-2">Profile Picture</label>
+                            <label className="block text-sm text-wihte font-medium mb-2">Profile Picture</label>
                             <input
                                 type="file"
-                                className="w-full bg-transparent px-3 py-2 border-none rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full bg-transparent text-wihte px-3 py-2 border-none rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 accept="image/png, image/jpeg"
                                 name="profilePicture"
                             />
