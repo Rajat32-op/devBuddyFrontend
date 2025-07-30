@@ -18,7 +18,7 @@ const CodeBlock = ({ code, language }) => {
     <div className="bg-gray-50 dark:bg-zinc-900 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700">
       {/* Header with language badge */}
       <div className="px-4 py-2 bg-gray-100 dark:bg-zinc-800 border-b border-zinc-300 dark:border-zinc-700 flex items-center justify-between">
-        <span className={`px-2 py-1 rounded text-xs font-medium ${getLanguageColor(language)}`}>
+        <span className={`px-2 py-1 rounded text-xs font-medium ${getLanguageColor(language.toLowerCase())}`}>
           {language.toUpperCase()}
         </span>
         <button className="text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
@@ -29,8 +29,7 @@ const CodeBlock = ({ code, language }) => {
       {/* Code content */}
       <div className="p-4 overflow-x-auto">
         <pre className="text-sm ">
-          <Prism language={language} style={dracula}>
-            {/* syntax highlighting */}
+          <Prism language={language.toLowerCase()} style={dracula}>
             {code}
           </Prism>
         </pre>

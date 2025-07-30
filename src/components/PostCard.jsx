@@ -38,6 +38,7 @@ const PostCard = ({ post }) => {
       setNewComment("");
     }
   };
+  const [current, setCurrent] = useState(0);
   return (
     <Card className="w-full bg-white dark:bg-gradient-to-br from-[#1a3760] via-[#4b5f7e] to-[#c9d1db] text-black dark:text-white border border-zinc-300 dark:border-zinc-700">
       <CardHeader>
@@ -64,23 +65,43 @@ const PostCard = ({ post }) => {
 
       <CardContent className="space-y-4">
         {/* Post Content */}
-        <div>
-          <p className="mb-3 text-zinc-800 dark:text-zinc-200">{post.caption}</p>
+        <div className="relative">
+          <p className="mb-4 text-zinc-800 dark:text-zinc-200">{post.caption}</p>
 
-          {post.codeSnippet !== "" && (
-            <CodeBlock
-              code={post.content.code}
-              language={post.content.language || "javascript"}
-            />
+          {post.codeSnippet.length !== 0 && (
+            <div className="space-y-4">
+              {post.codeSnippet.map((code,index)=>{
+                return (
+                  <CodeBlock
+                    key={index}
+                    code={code}
+                    language={post.language[index]}
+                  />
+                );
+              })}
+            </div>
           )}
 
-          {post.image !== "" && (
-            <div className="rounded-lg overflow-hidden">
-              <img
-                src={post.content.imageUrl}
-                alt="Post content"
-                className="w-full h-auto max-h-96 object-cover"
-              />
+          {post.imageUrl.length !== 0 && (
+            <div className="rounded-lg overflow-hidden my-2">
+              {post.imageUrl.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Image ${index + 1}`}
+                  className={`w-full h-auto max-h-96 object-cover ${index===current ? "block" : "hidden"}`}
+                />
+              ))}
+              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+              {/*Dots*/}
+            {post.imageUrl.length>1 && post.imageUrl.map((_, idx) => (
+              <button
+                key={idx}
+                className={`h-2 w-2 rounded-full ${current === idx ? "bg-white" : "bg-gray-400"} transition`}
+                onClick={() => setCurrent(idx)}
+              ></button>
+            ))}
+          </div>
             </div>
           )}
         </div>
