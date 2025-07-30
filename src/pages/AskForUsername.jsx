@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import LetterGlitch from "../components/LetterGlitchBg";
 import {FadeInView,ScaleAndBlur} from '../components/Animations'
 import { useNavigate,useLocation } from "react-router-dom";
 import { useUser } from "../providers/getUser.jsx"; 
@@ -37,16 +36,8 @@ const AskForUsername = () => {
   };
 
   return (
-    <div className="min-h-screen w-screen flex items-center justify-center relative overflow-hidden bg-black">
-      {/* Glitch Background */}
-      <div className="absolute inset-0 z-0 opacity-90">
-        <LetterGlitch
-          glitchSpeed={50}
-          centerVignette={true}
-          outerVignette={false}
-          smooth={true}
-        />
-      </div>
+    <div className="min-h-screen bg-[url('bg_signup.png')] w-screen flex items-center justify-center relative overflow-hidden bg-black">
+
         <div className="flex flex-col gap-10 items-center">
         <ScaleAndBlur>
         <h1 className="text-7xl z-10 font-bold bg-black/60 backdrop-blur-lg shadow-white/10 drop-shadow-2xl rounded-2xl text-white mb-4 text-center">
