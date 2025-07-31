@@ -51,7 +51,7 @@ const Sidebar = () => {
       </Card>
 
       {/* Navigation Menu */}
-      <Card className="bg-blue-500">
+      <Card className="">
         <CardHeader>
           <h3 className="font-semibold">Menu</h3>
         </CardHeader>
