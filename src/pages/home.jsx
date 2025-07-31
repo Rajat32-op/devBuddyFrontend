@@ -76,7 +76,7 @@ const Home = () => {
         setCodeLang([]);
         setCodes([]);
         setCodeSnippet("");
-        setSelectedLanguage("");
+        setSelectedLanguage("JavaScript");
         e.target.elements.caption.value = "";
         fetchUser();
         if (messageRef.current) {
@@ -105,7 +105,7 @@ const Home = () => {
             {message}
           </div>
         )}
-        <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="max-w-7xl z-0 mx-auto px-4 py-6">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Sidebar */}
             <div className="lg:col-span-1 hidden lg:block">

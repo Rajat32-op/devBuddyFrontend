@@ -4,7 +4,7 @@ import React, { forwardRef } from "react";
 const Card = forwardRef(({ className = "", ...props }, ref) => (
   <div
     ref={ref}
-    className={`border bg-white text-black shadow-sm dark:bg-gradient-to-t from-cyan-500 to-black dark:text-white dark:border-zinc-700 ${className}`}
+    className={`border bg-white text-black shadow-sm dark:text-white dark:border-zinc-700 ${!className.includes("dark:bg-gradient-to-")?"dark:bg-gradient-to-t from-cyan-500 to-black":className}${className||""}`}
     {...props}
   />
 ));

@@ -10,6 +10,7 @@ import Chat from './pages/Chat'
 import Notifications from './pages/Notifications'
 import UpdateProfile from './pages/UpdateProfile'
 import { ZoominIcon } from './components/Animations'
+import UserPage from './pages/User'
 
 function App() {
   
@@ -27,6 +28,7 @@ function App() {
             <Route path='/update-profile' element={<UpdateProfile/>}/>
             <Route path='/chat' element={<Chat/>}/>
             <Route path='/notifications' element={<Notifications/>}/>
+            <Route path='/user' element={<UserPage/>}/>
         </Routes>
       </BrowserRouter>
       </ZoominIcon>
