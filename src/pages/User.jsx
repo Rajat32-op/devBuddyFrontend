@@ -1,27 +1,32 @@
 import { useNavigate } from 'react-router-dom'
 import { useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar'
-import { useEffect ,useState} from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent } from '../components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '../components/ui/avatar';
 import { User } from 'lucide-react';
 import { useUser } from '../providers/getUser.jsx';
+import PostCard from '../components/PostCard';
 
-function useQuery(){
+function useQuery() {
     return new URLSearchParams(useLocation().search);
 }
 
 const UserPage = () => {
     const query = useQuery();
-    const userId= query.get('id');
-    const navigate=useNavigate();
-    if(userId===null || userId===undefined){
+    const userId = query.get('id');
+    const navigate = useNavigate();
+    if (userId === null || userId === undefined) {
         navigate('/')
     }
     const [profile, setProfile] = useState({});
     const [loading, setLoading] = useState(true);
-    const {user}=useUser();
-    useEffect(()=>{
+
+    const [userPosts, setUserPosts] = useState([]);
+    
+    let isFriends=true;
+    const { user } = useUser();
+    useEffect(() => {
         const fetchUser = async () => {
             setLoading(true)
             const response = await fetch(`http://localhost:3000/get-user?id=${userId}`, {
@@ -30,7 +35,12 @@ const UserPage = () => {
             if (response.status === 200) {
                 const data = await response.json();
                 setProfile(data);
-                if(user===data){
+                if(data.friends.includes(user._id)){
+                    isFriends=true;
+                }else{
+                    isFriends=false;
+                }
+                if (user._id === data._id) {
                     navigate('/profile');
                 }
                 setLoading(false);
@@ -39,8 +49,26 @@ const UserPage = () => {
             }
         };
         fetchUser();
-    },[userId])
-    if(loading){
+    }, [userId]);
+    useEffect(()=>{
+
+        if (isFriends) {
+            
+            const fetchPosts = async () => {
+                const response = await fetch(`http://localhost:3000/get-posts?userId=${profile._id}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (response.status === 200) {
+                    const data = await response.json();
+                    setUserPosts(data);
+                }
+            }
+            fetchPosts();
+        }
+    },[profile]);
+    if (loading) {
         return <div className="flex items-center justify-center h-screen">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500">
                 <span className="sr-only">Loading...</span>
@@ -91,7 +119,7 @@ const UserPage = () => {
                                     </div>
 
                                     <p className="text-sm text-muted-foreground">{new Date(profile.createdAt).toLocaleDateString()}</p>
-                                    {profile.friends.includes(user._id) ? (
+                                    {isFriends ? (
                                         <button className="px-3 py-1 border rounded text-sm mt-4 bg-blue-500 text-white">
                                             Remove Friend
                                         </button>
@@ -100,11 +128,18 @@ const UserPage = () => {
                                             Add Friend
                                         </button>
                                     )}
-                                    
+
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
+            {isFriends &&
+                <div className="space-y-6">
+                    {userPosts.map((post) => (
+                        <PostCard key={post._id} post={post} />
+                    ))}
+                </div>
+            }
                 </div>
             </div>
         </div>
