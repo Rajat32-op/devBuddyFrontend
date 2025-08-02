@@ -7,6 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '../components/ui/avatar';
 import { User } from 'lucide-react';
 import { useUser } from '../providers/getUser.jsx';
 import PostCard from '../components/PostCard';
+import { div } from 'framer-motion/client';
 
 function useQuery() {
     return new URLSearchParams(useLocation().search);
@@ -23,9 +24,9 @@ const UserPage = () => {
     const [loading, setLoading] = useState(true);
 
     const [userPosts, setUserPosts] = useState([]);
-    
-    let isFriends=true;
-    const { user } = useUser();
+
+    const [friendStatus, setFriendStatus] = useState("dont know");
+    const { user ,setUser} = useUser();
     useEffect(() => {
         const fetchUser = async () => {
             setLoading(true)
@@ -35,10 +36,16 @@ const UserPage = () => {
             if (response.status === 200) {
                 const data = await response.json();
                 setProfile(data);
-                if(data.friends.includes(user._id)){
-                    isFriends=true;
-                }else{
-                    isFriends=false;
+                if (data.friends.includes(user._id)) {
+                    setFriendStatus("friends");
+                } else if (data.friend_request_sent.includes(user._id)) {
+                    setFriendStatus("request-received");
+                }
+                else if (data.friend_request_received.includes(user._id)) {
+                    setFriendStatus("request-sent");
+                }
+                else {
+                    setFriendStatus("not-friend");
                 }
                 if (user._id === data._id) {
                     navigate('/profile');
@@ -50,10 +57,11 @@ const UserPage = () => {
         };
         fetchUser();
     }, [userId]);
-    useEffect(()=>{
 
-        if (isFriends) {
-            
+    useEffect(() => {
+
+        if (friendStatus == "friends") {
+
             const fetchPosts = async () => {
                 const response = await fetch(`http://localhost:3000/get-posts?userId=${profile._id}`, {
                     method: 'GET',
@@ -67,7 +75,96 @@ const UserPage = () => {
             }
             fetchPosts();
         }
-    },[profile]);
+    }, [profile]);
+
+    const sendFriendRequest = async () => {
+        const response = await fetch(`http://localhost:3000/send-friend-request`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: profile._id })
+        });
+        if (response.status === 200) {
+            setFriendStatus("request-sent");
+            console.log("Friend request sent successfully");
+            setProfile(prev => ({ ...prev, friend_request_received: [...prev.friend_request_sent, user._id] }));
+            setUser(prev => ({ ...prev, friend_request_sent: [...prev.friend_request_sent, profile._id] }));
+        } else {
+            console.error("Failed to send friend request");
+        }
+    }
+
+    const acceptFriend=async (friendId) => {
+        const response = await fetch(`http://localhost:3000/add-friend`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ friendId: friendId })
+        });
+        if (response.status === 200) {
+            setFriendStatus("friends");
+            console.log("Friend request accepted successfully");
+            setProfile(prev => ({
+                ...prev,
+                friends: [...prev.friends, friendId],
+                friend_request_received: prev.friend_request_received.filter(id => id !== friendId)
+            }));
+            setUser(prev => ({
+                ...prev,
+                friends: [...prev.friends, friendId],
+                friend_request_sent: prev.friend_request_sent.filter(id => id !== friendId)
+            }));
+        } else {
+            console.error("Failed to accept friend request");
+        }
+    }
+
+    const removeFriennd=async (friendId)=>{
+        const response = await fetch(`http://localhost:3000/remove-friend`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ friendId: friendId })
+        });
+        if (response.status === 200) {
+            setFriendStatus("not-friend");
+            console.log("Friend removed successfully");
+            setProfile(prev => ({
+                ...prev,
+                friends: prev.friends.filter(id => id !== friendId)
+            }));
+            setUser(prev => ({
+                ...prev,
+                friends: prev.friends.filter(id => id !== friendId)
+            }));
+        } else {
+            console.error("Failed to remove friend");
+        }   
+    }
+
+    const declineFriend = async (friendId) => {
+        const response = await fetch(`http://localhost:3000/decline-friend`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ friendId: friendId })
+        });
+        if (response.status === 200) {
+            setFriendStatus("not-friend");
+            console.log("Friend request declined successfully");
+            setProfile(prev => ({
+                ...prev,
+                friend_request_sent: prev.friend_request_sent.filter(id => id !== friendId)
+            }));
+            setUser(prev => ({
+                ...prev,
+                friend_request_received: prev.friend_request_received.filter(id => id !== friendId)
+            }));
+        } else {
+            console.error("Failed to decline friend request");
+        }
+    }
+
     if (loading) {
         return <div className="flex items-center justify-center h-screen">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500">
@@ -119,27 +216,40 @@ const UserPage = () => {
                                     </div>
 
                                     <p className="text-sm text-muted-foreground">{new Date(profile.createdAt).toLocaleDateString()}</p>
-                                    {isFriends ? (
-                                        <button className="px-3 py-1 border rounded text-sm mt-4 bg-blue-500 text-white">
+                                    {friendStatus === "friends" ? (
+                                        <button onClick={()=>{removeFriennd(profile._id)}} className="px-3 py-1 border rounded text-sm mt-4 bg-red-500 hover:bg-red-400 text-white">
                                             Remove Friend
                                         </button>
-                                    ) : (
-                                        <button className="px-3 py-1 border rounded text-sm mt-4 bg-green-500 text-white">
+                                    ) : friendStatus === "request-sent" ? (
+                                        <button className="px-3 py-1 border rounded text-sm mt-4 bg-gray-500 cursor-not-allowed text-white">
+                                            Request Sent
+                                        </button>
+                                    ) : friendStatus === "request-received" ? (
+                                        <div className='flex gap-2'>
+                                        <button onClick={() => acceptFriend(profile._id)} className="px-3 py-1 border rounded text-sm mt-4 bg-green-500 hover:bg-green-400 text-white">
+                                            Accept Request
+                                        </button>
+                                        <button onClick={() => declineFriend(profile._id)} className="px-3 py-1 border rounded text-sm mt-4 bg-red-700 hover:bg-red-600 text-white">
+                                            Decline Request
+                                        </button>
+                                        </div>
+                                    ) : friendStatus === "not-friend" ? (
+                                        <button onClick={sendFriendRequest} className="px-3 py-1 border rounded text-sm mt-4 bg-blue-500 hover:bg-blue-400 text-white">
                                             Add Friend
                                         </button>
-                                    )}
+                                    ) : null}
 
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
-            {isFriends &&
-                <div className="space-y-6">
-                    {userPosts.map((post) => (
-                        <PostCard key={post._id} post={post} />
-                    ))}
-                </div>
-            }
+                    {friendStatus === "friends" &&
+                        <div className="space-y-6">
+                            {userPosts.map((post) => (
+                                <PostCard key={post._id} post={post} />
+                            ))}
+                        </div>
+                    }
                 </div>
             </div>
         </div>

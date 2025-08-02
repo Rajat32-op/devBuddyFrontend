@@ -5,7 +5,7 @@ import { useUser } from "../providers/getUser.jsx";
 
 const AskForUsername = () => {
   const [username, setUsername] = useState("");
-
+  const  [error, setError] = useState("");
   const location=useLocation();
   const navigate=useNavigate();
   const {fetchUser} = useUser();
@@ -18,26 +18,34 @@ const AskForUsername = () => {
   const handleSubmit = async(e) => {
     e.preventDefault();
     // handle username submission logic here
-    const data={username:e.target.elements.username.value}
-    let res=await fetch('http://localhost:3000/addUserName-google',{
+    const data={username:username}
+    const res=await fetch('http://localhost:3000/addUserName-google',{
       method:'PATCH',
       body:JSON.stringify(data),
       credentials:'include',
       headers:{'Content-Type':'application/json'}
     })
-    res=await res.json()
-    if(res.message==="Login successful"){
+    const result=await res.json()
+    if(res.status===200){
       fetchUser();
       navigate('/')
     }
     else{
-      navigate('/askForUsername',{state:{from:'again'}})
+      setError(result.message);
+      setTimeout(()=>{
+        setError("");
+      },2000)
+      setUsername("");
     }
   };
 
   return (
     <div className="min-h-screen bg-[url('bg_signup.png')] w-screen flex items-center justify-center relative overflow-hidden bg-black">
-
+      {error && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg">
+          {error}
+        </div>
+      )}
         <div className="flex flex-col gap-10 items-center">
         <ScaleAndBlur>
         <h1 className="text-7xl z-10 font-bold bg-black/60 backdrop-blur-lg shadow-white/10 drop-shadow-2xl rounded-2xl text-white mb-4 text-center">

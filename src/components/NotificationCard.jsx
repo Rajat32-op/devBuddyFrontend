@@ -1,7 +1,7 @@
 import { Heart, UserPlus, Clock ,Trash} from "lucide-react";
 import { Card } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import placeholderImage from "../assets/placeholder.png";
+import { time } from "framer-motion";
 
 export function NotificationCard({ 
   notification, 
@@ -9,11 +9,30 @@ export function NotificationCard({
   onAcceptFriend, 
   onDeclineFriend 
 }) {
+
   const handleCardClick = () => {
     if (!notification.isRead) {
       onMarkAsRead(notification._id);
     }
   };
+
+  function timeAgo(date) {
+  const now = Date.now();
+  const postTime = new Date(date).getTime(); // supports both Date and ISO string
+  const diff = now - postTime;
+
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(diff / (1000 * 60));
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+  if (seconds < 60) return `${seconds} seconds ago`;
+  if (minutes < 60) return `${minutes} minutes ago`;
+  if (hours < 24) return `${hours} hours ago`;
+  if (days < 7) return `${days} days ago`;
+
+  return new Date(date).toLocaleDateString(); // fallback: show actual date
+}
 
   const renderNotificationContent = () => {
     switch (notification.type) {
@@ -47,7 +66,7 @@ export function NotificationCard({
             <div className="flex-1 min-w-0">
               <p className="text-sm">
                 <span className="font-semibold text-white">
-                  {notification.sentBy}
+                  {notification.from}
                 </span>
                 <span className="text-gray-400"> sent you a friend request</span>
               </p>
@@ -89,14 +108,14 @@ export function NotificationCard({
       } hover:dark:bg-gray-800`}
       onClick={handleCardClick}
     >
-      <div className="flex items-start space-x-3">
+      <div className="flex items-center space-x-3">
         <Avatar className="w-12 h-12 flex-shrink-0">
           <AvatarImage 
-            src={notification.sentByAvatar||placeholderImage} 
-            alt={notification.sentBy}
+            src={notification.sentByAvatar||""} 
+            alt={notification.from}
           />
           <AvatarFallback>
-            {notification.sentBy.split(' ').map(n => n[0]).join('')}
+            {notification.from.split(' ').map(n => n[0]).join('')}
           </AvatarFallback>
         </Avatar>
 
@@ -105,7 +124,7 @@ export function NotificationCard({
           
           <div className="flex items-center mt-2 text-xs text-gray-300">
             <Clock className="w-3 h-3 mr-1" />
-            {notification.timestamp.t}
+            {timeAgo(notification.createdAt)}
           </div>
         </div>
 
