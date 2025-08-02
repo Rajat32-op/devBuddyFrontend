@@ -22,14 +22,43 @@ const PostCard = ({ post }) => {
 
   return new Date(date).toLocaleDateString(); // fallback: show actual date
 }
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(post.isLiked);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [likes, setLikes] = useState(post.likes);
+  const [likeDisabled,setLikeDisabled]=useState(false);
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-    setLikes(isLiked ? likes - 1 : likes + 1);
+  const handleLike = async() => {
+    if(isLiked){
+      setLikeDisabled(true)
+      setIsLiked(false);
+      setLikes(likes - 1);
+      const response=await fetch(`http://localhost:3000/unlike-post`, {
+        method: 'POST',
+        credentials: 'include',
+        body: JSON.stringify({ postId: post._id }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      setLikeDisabled(false);
+      
+    }
+    else{
+      setLikeDisabled(true)
+      setIsLiked(true);
+      setLikes(likes + 1);
+      
+      const response=await fetch(`http://localhost:3000/like-post`, {
+        method: 'POST',
+        body: JSON.stringify({ postId: post._id }),
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      setLikeDisabled(false);
+    }
   };
 
   const handleComment = () => {
@@ -119,6 +148,7 @@ const PostCard = ({ post }) => {
         <div className="flex items-center justify-between pt-2 border-t border-zinc-200 dark:border-zinc-700">
           <div className="flex items-center space-x-4">
             <button
+              disabled={likeDisabled}
               onClick={handleLike}
               className={`${isLiked ? "text-red-500" : ""}`}
             >
