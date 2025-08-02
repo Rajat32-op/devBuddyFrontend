@@ -76,6 +76,11 @@ const UserPage = () => {
             fetchPosts();
         }
     }, [profile]);
+    
+    /*
+    These functions take id of friend you searched and in his request recieved they add your id
+    in your request sent they add his id
+    */
 
     const sendFriendRequest = async () => {
         const response = await fetch(`http://localhost:3000/send-friend-request`, {
@@ -93,6 +98,7 @@ const UserPage = () => {
             console.error("Failed to send friend request");
         }
     }
+
 
     const acceptFriend=async (friendId) => {
         const response = await fetch(`http://localhost:3000/add-friend`, {

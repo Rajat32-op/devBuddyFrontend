@@ -1,13 +1,12 @@
-import { Heart, UserPlus, Clock ,Trash} from "lucide-react";
+import { Heart, UserPlus, Clock, Trash } from "lucide-react";
 import { Card } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { time } from "framer-motion";
 
-export function NotificationCard({ 
-  notification, 
-  onMarkAsRead, 
-  onAcceptFriend, 
-  onDeclineFriend 
+export function NotificationCard({
+  notification,
+  onMarkAsRead,
+  acceptFriend,
+  declineFriend
 }) {
 
   const handleCardClick = () => {
@@ -17,22 +16,22 @@ export function NotificationCard({
   };
 
   function timeAgo(date) {
-  const now = Date.now();
-  const postTime = new Date(date).getTime(); // supports both Date and ISO string
-  const diff = now - postTime;
+    const now = Date.now();
+    const postTime = new Date(date).getTime(); // supports both Date and ISO string
+    const diff = now - postTime;
 
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(diff / (1000 * 60));
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-  if (seconds < 60) return `${seconds} seconds ago`;
-  if (minutes < 60) return `${minutes} minutes ago`;
-  if (hours < 24) return `${hours} hours ago`;
-  if (days < 7) return `${days} days ago`;
+    if (seconds < 60) return `${seconds} seconds ago`;
+    if (minutes < 60) return `${minutes} minutes ago`;
+    if (hours < 24) return `${hours} hours ago`;
+    if (days < 7) return `${days} days ago`;
 
-  return new Date(date).toLocaleDateString(); // fallback: show actual date
-}
+    return new Date(date).toLocaleDateString(); // fallback: show actual date
+  }
 
   const renderNotificationContent = () => {
     switch (notification.type) {
@@ -48,7 +47,7 @@ export function NotificationCard({
                   {notification.sentBy}
                 </span>
                 <span className="text-gray-400"> liked your post</span>
-                
+
               </p>
               <button>
                 <Trash className="w-4 h-4 text-gray-400 hover:text-red-500" />
@@ -56,7 +55,7 @@ export function NotificationCard({
             </div>
           </div>
         );
-      
+
       case "friend_request":
         return (
           <div className="flex items-center space-x-3">
@@ -71,20 +70,20 @@ export function NotificationCard({
                 <span className="text-gray-400"> sent you a friend request</span>
               </p>
               <div className="flex space-x-2 mt-3">
-                <button 
+                <button
                   className="text-sm px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onAcceptFriend?.(notification._id);
+                    acceptFriend(notification.fromId,notification._id);
                   }}
                 >
                   Accept
                 </button>
-                <button 
+                <button
                   className="text-sm px-3 py-1 border border-gray-500 text-gray-300 rounded hover:bg-gray-700"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDeclineFriend?.(notification._id);
+                    declineFriend(notification.fromId,notification._id);
                   }}
                 >
                   Decline
@@ -93,7 +92,7 @@ export function NotificationCard({
             </div>
           </div>
         );
-      
+
       default:
         return null;
     }
@@ -101,17 +100,16 @@ export function NotificationCard({
 
   return (
     <Card
-      className={`p-4 cursor-pointer dark:bg-none transition-all duration-200 border rounded-md ${
-        !notification.isRead
+      className={`p-4 cursor-pointer dark:bg-none transition-all duration-200 border rounded-md ${!notification.isRead
           ? 'dark:bg-gray-800 border-l-4 border-blue-500'
           : 'dark:bg-gray-900 border-gray-700'
-      } hover:dark:bg-gray-800`}
+        } hover:dark:bg-gray-800`}
       onClick={handleCardClick}
     >
       <div className="flex items-center space-x-3">
         <Avatar className="w-12 h-12 flex-shrink-0">
-          <AvatarImage 
-            src={notification.sentByAvatar||""} 
+          <AvatarImage
+            src={notification.sentByAvatar || ""}
             alt={notification.from}
           />
           <AvatarFallback>
@@ -121,7 +119,7 @@ export function NotificationCard({
 
         <div className="flex-1 min-w-0">
           {renderNotificationContent()}
-          
+
           <div className="flex items-center mt-2 text-xs text-gray-300">
             <Clock className="w-3 h-3 mr-1" />
             {timeAgo(notification.createdAt)}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bell, Check, Settings } from "lucide-react";
 import { NotificationCard } from "../components/NotificationCard";
 import Navbar from "../components/Navbar";
@@ -19,8 +19,27 @@ export default function Notifications() {
       </div>
     );
   }
-  const [notifications, setNotifications] = useState(user.notifications||[]);
+  const [notifications, setNotifications] = useState([]);
 
+  useEffect(()=>{
+    async function fetchNotifications() {
+      try {
+        const response = await fetch("http://localhost:3000/notifications", {
+          method: "GET",
+          credentials: "include"
+        });
+        if (response.status === 200) {
+          const data = await response.json();
+          setNotifications(data);
+        } else {
+          console.error("Failed to fetch notifications");
+        }
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    }
+    fetchNotifications();
+  },[])
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
@@ -41,19 +60,29 @@ export default function Notifications() {
     console.log("All notifications marked as read");
   };
 
-  const handleAcceptFriend = (id) => {
-    const notification = notifications.find(n => n._id === id);
-    if (notification) {
-      setNotifications(prev => prev.filter(n => n._id !== id));
+  const acceptFriend = async (friendId,notifId) => {
+    const response = await fetch(`http://localhost:3000/add-friend`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ friendId: friendId })
+    });
+    if(response.status === 200) {
+      setNotifications(notifications.filter(n => n._id !== notifId));
     }
-  };
+  }
 
-  const handleDeclineFriend = (id) => {
-    const notification = notifications.find(n => n._id === id);
-    if (notification) {
-      setNotifications(prev => prev.filter(n => n._id !== id));
+  const declineFriend = async (friendId,notifId) => {
+    const response = await fetch(`http://localhost:3000/decline-friend`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ friendId: friendId })
+    });
+    if(response.status === 200) {
+      setNotifications(notifications.filter(n => n._id !== notifId));
     }
-  };
+  }
 
   return (
 
@@ -106,8 +135,8 @@ export default function Notifications() {
                 key={notification._id}
                 notification={notification}
                 onMarkAsRead={handleMarkAsRead}
-                onAcceptFriend={handleAcceptFriend}
-                onDeclineFriend={handleDeclineFriend}
+                acceptFriend={acceptFriend}
+                declineFriend={declineFriend}
               />
             ))
           )}
