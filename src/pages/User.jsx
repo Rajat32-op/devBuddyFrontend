@@ -7,7 +7,6 @@ import { Avatar, AvatarImage, AvatarFallback } from '../components/ui/avatar';
 import { User } from 'lucide-react';
 import { useUser } from '../providers/getUser.jsx';
 import PostCard from '../components/PostCard';
-import { div } from 'framer-motion/client';
 
 function useQuery() {
     return new URLSearchParams(useLocation().search);

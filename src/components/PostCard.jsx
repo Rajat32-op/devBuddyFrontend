@@ -112,14 +112,14 @@ const PostCard = ({ post }) => {
     <Card className="w-full bg-white dark:bg-gradient-to-br from-[#1a3760] via-[#4b5f7e] to-[#c9d1db] text-black dark:text-white border border-zinc-300 dark:border-zinc-700">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Avatar>
+          <div onClick={()=>{navigate(`/user?id=${post.userId}`)}} className="flex items-center space-x-3">
+            <Avatar className="cursor-pointer">
               <AvatarImage src={post.profilePicture || ''} />
               <AvatarFallback>
                 <User className="h-4 w-4" />
               </AvatarFallback>
             </Avatar>
-            <div>
+            <div className="cursor-pointer">
               <p className="font-semibold">{post.username}</p>
               <p className="text-sm text-muted-foreground dark:text-zinc-400">
                 @{post.username} • {timeAgo(post.createdAt)}
