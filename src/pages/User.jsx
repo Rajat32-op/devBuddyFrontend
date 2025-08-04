@@ -25,7 +25,7 @@ const UserPage = () => {
     const [userPosts, setUserPosts] = useState([]);
 
     const [friendStatus, setFriendStatus] = useState("dont know");
-    const { user ,setUser} = useUser();
+    const { user, setUser } = useUser();
     useEffect(() => {
         const fetchUser = async () => {
             setLoading(true)
@@ -75,7 +75,7 @@ const UserPage = () => {
             fetchPosts();
         }
     }, [profile]);
-    
+
     /*
     These functions take id of friend you searched and in his request recieved they add your id
     in your request sent they add his id
@@ -99,7 +99,7 @@ const UserPage = () => {
     }
 
 
-    const acceptFriend=async (friendId) => {
+    const acceptFriend = async (friendId) => {
         const response = await fetch(`http://localhost:3000/add-friend`, {
             method: 'POST',
             credentials: 'include',
@@ -124,7 +124,7 @@ const UserPage = () => {
         }
     }
 
-    const removeFriennd=async (friendId)=>{
+    const removeFriend = async (friendId) => {
         const response = await fetch(`http://localhost:3000/remove-friend`, {
             method: 'POST',
             credentials: 'include',
@@ -144,7 +144,7 @@ const UserPage = () => {
             }));
         } else {
             console.error("Failed to remove friend");
-        }   
+        }
     }
 
     const declineFriend = async (friendId) => {
@@ -222,7 +222,7 @@ const UserPage = () => {
 
                                     <p className="text-sm text-muted-foreground">{new Date(profile.createdAt).toLocaleDateString()}</p>
                                     {friendStatus === "friends" ? (
-                                        <button onClick={()=>{removeFriennd(profile._id)}} className="px-3 py-1 border rounded text-sm mt-4 bg-red-500 hover:bg-red-400 text-white">
+                                        <button onClick={() => { removeFriend(profile._id) }} className="px-3 py-1 border rounded text-sm mt-4 bg-red-500 hover:bg-red-400 text-white">
                                             Remove Friend
                                         </button>
                                     ) : friendStatus === "request-sent" ? (
@@ -231,12 +231,12 @@ const UserPage = () => {
                                         </button>
                                     ) : friendStatus === "request-received" ? (
                                         <div className='flex gap-2'>
-                                        <button onClick={() => acceptFriend(profile._id)} className="px-3 py-1 border rounded text-sm mt-4 bg-green-500 hover:bg-green-400 text-white">
-                                            Accept Request
-                                        </button>
-                                        <button onClick={() => declineFriend(profile._id)} className="px-3 py-1 border rounded text-sm mt-4 bg-red-700 hover:bg-red-600 text-white">
-                                            Decline Request
-                                        </button>
+                                            <button onClick={() => acceptFriend(profile._id)} className="px-3 py-1 border rounded text-sm mt-4 bg-green-500 hover:bg-green-400 text-white">
+                                                Accept Request
+                                            </button>
+                                            <button onClick={() => declineFriend(profile._id)} className="px-3 py-1 border rounded text-sm mt-4 bg-red-700 hover:bg-red-600 text-white">
+                                                Decline Request
+                                            </button>
                                         </div>
                                     ) : friendStatus === "not-friend" ? (
                                         <button onClick={sendFriendRequest} className="px-3 py-1 border rounded text-sm mt-4 bg-blue-500 hover:bg-blue-400 text-white">
@@ -248,13 +248,13 @@ const UserPage = () => {
                             </div>
                         </CardContent>
                     </Card>
-                    {friendStatus === "friends" &&
-                        <div className="space-y-6">
-                            {userPosts.map((post) => (
-                                <PostCard key={post._id} post={post} />
-                            ))}
-                        </div>
-                    }
+                    
+                    <div className="space-y-6">
+                        {userPosts.map((post) => (
+                            <PostCard key={post._id} post={post} />
+                        ))}
+                    </div>
+
                 </div>
             </div>
         </div>
