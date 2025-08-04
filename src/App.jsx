@@ -11,6 +11,7 @@ import Notifications from './pages/Notifications'
 import UpdateProfile from './pages/UpdateProfile'
 import { ZoominIcon } from './components/Animations'
 import UserPage from './pages/User'
+import SavedPosts from './pages/SavedPosts'
 
 function App() {
   
@@ -29,6 +30,7 @@ function App() {
             <Route path='/chat' element={<Chat/>}/>
             <Route path='/notifications' element={<Notifications/>}/>
             <Route path='/user' element={<UserPage/>}/>
+            <Route path='/savedPosts' element={<SavedPosts/>}/>
         </Routes>
       </BrowserRouter>
       </ZoominIcon>

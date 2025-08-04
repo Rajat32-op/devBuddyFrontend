@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, User, Users } from "lucide-react";
+import { Bookmark, Heart, MessageCircle, User, Users } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { useNavigate } from "react-router-dom";
@@ -72,6 +72,10 @@ const Sidebar = () => {
             <button onClick={()=>{navigate('/notifications')}} className="w-full flex items-center gap-2">
               <Heart className="mr-2 h-5 w-5" />
               Notifications
+            </button>
+            <button onClick={()=>{navigate('/savedPosts')}} className="w-full flex items-center gap-2">
+              <Bookmark className="mr-2 h-5 w-5" />
+              Saved Posts
             </button>
           </nav>
         </CardContent>

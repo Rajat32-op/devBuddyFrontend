@@ -1,39 +1,47 @@
 import { useState } from "react";
-import { Heart, MessageCircle, User } from "lucide-react";
+import { Heart, MessageCircle, User, BookmarkPlus } from "lucide-react";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import CodeBlock from "./CodeBlock";
+import { useUser } from "../providers/getUser";
+import { useNavigate } from "react-router-dom";
 
 const PostCard = ({ post }) => {
   function timeAgo(date) {
-  const now = Date.now();
-  const postTime = new Date(date).getTime(); // supports both Date and ISO string
-  const diff = now - postTime;
+    const now = Date.now();
+    const postTime = new Date(date).getTime(); // supports both Date and ISO string
+    const diff = now - postTime;
 
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(diff / (1000 * 60));
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-  if (seconds < 60) return `${seconds} seconds ago`;
-  if (minutes < 60) return `${minutes} minutes ago`;
-  if (hours < 24) return `${hours} hours ago`;
-  if (days < 7) return `${days} days ago`;
+    if (seconds < 60) return `${seconds} seconds ago`;
+    if (minutes < 60) return `${minutes} minutes ago`;
+    if (hours < 24) return `${hours} hours ago`;
+    if (days < 7) return `${days} days ago`;
 
-  return new Date(date).toLocaleDateString(); // fallback: show actual date
-}
+    return new Date(date).toLocaleDateString(); // fallback: show actual date
+  }
+
+  const navigate = useNavigate();
+  const { user } = useUser();
+
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [likes, setLikes] = useState(post.likes);
-  const [likeDisabled,setLikeDisabled]=useState(false);
+  const [likeDisabled, setLikeDisabled] = useState(false);
+  const [isSaved, setIsSaved] = useState(user.savedPosts.includes(post._id));
+  const [saveDisabled,setSavedisbled]=useState(false);
 
-  const handleLike = async() => {
-    if(isLiked){
+  const handleLike = async () => {
+    if (isLiked) {
       setLikeDisabled(true)
       setIsLiked(false);
       setLikes(likes - 1);
-      const response=await fetch(`http://localhost:3000/unlike-post`, {
+      const response = await fetch(`http://localhost:3000/unlike-post`, {
         method: 'POST',
         credentials: 'include',
         body: JSON.stringify({ postId: post._id }),
@@ -42,14 +50,16 @@ const PostCard = ({ post }) => {
         },
       });
       setLikeDisabled(false);
-      
+      if (response.status != 200) {
+        navigate('/login');
+      }
     }
-    else{
+    else {
       setLikeDisabled(true)
       setIsLiked(true);
       setLikes(likes + 1);
-      
-      const response=await fetch(`http://localhost:3000/like-post`, {
+
+      const response = await fetch(`http://localhost:3000/like-post`, {
         method: 'POST',
         body: JSON.stringify({ postId: post._id }),
         credentials: 'include',
@@ -58,6 +68,9 @@ const PostCard = ({ post }) => {
         },
       });
       setLikeDisabled(false);
+      if (response.status != 200) {
+        navigate('/login');
+      }
     }
   };
 
@@ -67,6 +80,33 @@ const PostCard = ({ post }) => {
       setNewComment("");
     }
   };
+
+  const handleSave = async (id) => {
+    setSavedisbled(true)
+    let path=""
+    if(isSaved){
+      path='http://localhost:3000/unsave-post'
+    }
+    else{
+      path='http://localhost:3000/save-post'
+    }
+    setIsSaved(!isSaved);
+    
+    const response = await fetch(path, {
+      credentials: 'include',
+      method:'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ postId: id })
+    });
+    console.log(response.status);
+    if (response.status != 200) {
+      navigate('/login');
+    }
+    setSavedisbled(false)
+  }
+
   const [current, setCurrent] = useState(0);
   return (
     <Card className="w-full bg-white dark:bg-gradient-to-br from-[#1a3760] via-[#4b5f7e] to-[#c9d1db] text-black dark:text-white border border-zinc-300 dark:border-zinc-700">
@@ -74,7 +114,7 @@ const PostCard = ({ post }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Avatar>
-              <AvatarImage src={post.profilePicture||''} />
+              <AvatarImage src={post.profilePicture || ''} />
               <AvatarFallback>
                 <User className="h-4 w-4" />
               </AvatarFallback>
@@ -86,9 +126,6 @@ const PostCard = ({ post }) => {
               </p>
             </div>
           </div>
-          <button className="text-blue-500 hover:text-blue-600 dark:hover:text-blue-400">
-            Follow
-          </button>
         </div>
       </CardHeader>
 
@@ -99,7 +136,7 @@ const PostCard = ({ post }) => {
 
           {post.codeSnippet.length !== 0 && (
             <div className="space-y-4">
-              {post.codeSnippet.map((code,index)=>{
+              {post.codeSnippet.map((code, index) => {
                 return (
                   <CodeBlock
                     key={index}
@@ -118,19 +155,19 @@ const PostCard = ({ post }) => {
                   key={index}
                   src={image}
                   alt={`Image ${index + 1}`}
-                  className={`w-full h-auto max-h-96 object-cover ${index===current ? "block" : "hidden"}`}
+                  className={`w-full h-auto max-h-96 object-cover ${index === current ? "block" : "hidden"}`}
                 />
               ))}
               <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-              {/*Dots*/}
-            {post.imageUrl.length>1 && post.imageUrl.map((_, idx) => (
-              <button
-                key={idx}
-                className={`h-2 w-2 rounded-full ${current === idx ? "bg-white" : "bg-gray-400"} transition`}
-                onClick={() => setCurrent(idx)}
-              ></button>
-            ))}
-          </div>
+                {/*Dots*/}
+                {post.imageUrl.length > 1 && post.imageUrl.map((_, idx) => (
+                  <button
+                    key={idx}
+                    className={`h-2 w-2 rounded-full ${current === idx ? "bg-white" : "bg-gray-400"} transition`}
+                    onClick={() => setCurrent(idx)}
+                  ></button>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -161,6 +198,11 @@ const PostCard = ({ post }) => {
             >
               <MessageCircle className="mr-1 h-4 w-4" />
               comments
+            </button>
+          </div>
+          <div className="">
+            <button disabled={saveDisabled} onClick={()=>{handleSave(post._id)}}>
+              <BookmarkPlus className={`${isSaved ? "fill-current" : ""} mr-1 h-7 w-7`}></BookmarkPlus>
             </button>
           </div>
         </div>
