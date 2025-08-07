@@ -15,12 +15,11 @@ import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../providers/getUser.jsx";
 import Particles from "../components/particle-bg.jsx";
-import socket from "../providers/socketProvider.jsx";
 import { debounce, method } from "lodash";
 
 const Chat = () => {
 
-  const { user, loading } = useUser();
+  const { user, loading ,socket} = useUser();
 
   if (loading) {
     return (

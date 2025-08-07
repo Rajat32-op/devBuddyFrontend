@@ -1,10 +1,12 @@
 import { createContext, useState, useEffect, useContext } from 'react';
+import { io } from 'socket.io-client';
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [socket,setSocket]=useState(null)
     async function fetchUser() {
         setUser(undefined);
         setLoading(true);
@@ -16,6 +18,12 @@ export const UserProvider = ({ children }) => {
             if (response.status === 200) {
                 let tempuser = await response.json();
                 setUser(tempuser);
+                setSocket( io("http://localhost:3000", {
+                  withCredentials: true,
+                  transports: ['websocket'],
+                  reconnection:false,
+                  query:{userId:tempuser._id}
+                }));
             }
             else {
                 setUser(null);
@@ -31,7 +39,7 @@ export const UserProvider = ({ children }) => {
         fetchUser();
     }, [])
     return (
-        <UserContext.Provider value={{ user, setUser,fetchUser ,loading}}>
+        <UserContext.Provider value={{ user, setUser,fetchUser ,loading,socket}}>
             {children}
         </UserContext.Provider>
     );

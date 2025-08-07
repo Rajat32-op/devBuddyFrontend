@@ -4,16 +4,26 @@ import { Card, CardContent, CardHeader } from "./ui/card";
 import { useNavigate } from "react-router-dom";
 import { div } from "framer-motion/client";
 import { useUser } from "../providers/getUser.jsx"; // Assuming this is the correct path to your user provider
+import { useEffect, useState } from "react";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const {user,loading} = useUser(); 
-  
-  const activeFriends = [
-    { name: "Alice Cooper", status: "online" },
-    { name: "Bob Smith", status: "online" },
-    { name: "Carol Johnson", status: "away" },
-  ];
+
+  const [activeFriends,setActivefriends]=useState([]);
+  useEffect(()=>{
+    const fetchOnlineFriends=async()=>{
+      const response=await fetch('http://localhost:3000/get-online-friends',{
+        credentials:'include'
+      })
+      if(response.ok){
+        const data=await response.json();
+        setActivefriends(data);
+      }
+    }
+    fetchOnlineFriends();
+  },[])
+
   if(loading){
     return(
       <div className="flex justify-center h-full gap-2 min-h-[200px]">
@@ -82,38 +92,43 @@ const Sidebar = () => {
       </Card>
 
       {/* Active Friends */}
-      <Card>
+      {activeFriends.length===0?(
+        <div className="bg-gradient-to-t from-cyan-500 to-black border bg-white text-black shadow-sm dark:text-white dark:border-zinc-700 py-5 flex justify-center">
+          <h3>No Active Friends Found</h3>
+        </div>
+        
+      ):(
+        <Card>
         <CardHeader>
-          <h3 className="font-semibold">Active Now</h3>
+        <h3 className="font-semibold">Active Friends</h3>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {activeFriends.map((friend) => (
+        <div className="space-y-3">
+        {activeFriends.map((friend) => (
               <div key={friend.name} className="flex items-center space-x-2">
-                <div className="relative">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-xs">
-                      {friend.name.split(" ").map(n => n[0]).join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div
-                    className={`
-                      absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-background
-                      ${friend.status === "online" ? "bg-green-500" : "bg-yellow-500"}
-                    `}
-                  />
+              <div className="relative">
+              <Avatar className="h-8 w-8">
+              <AvatarFallback className="text-xs">
+              {friend.name.split(" ").map(n => n[0]).join("")}
+              </AvatarFallback>
+              </Avatar>
+              <div
+              className={`
+                absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-background bg-green-500`}
+                />
                 </div>
                 <div>
-                  <p className="text-sm font-medium">{friend.name}</p>
-                  <p className="text-xs text-muted-foreground capitalize">
-                    {friend.status}
-                  </p>
+                <p className="text-sm font-medium">{friend.name}</p>
+                <p className="text-xs text-muted-foreground capitalize">
+                {friend.status}
+                </p>
                 </div>
+                </div>
+              ))}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              </CardContent>
+              </Card>
+            )}
     </div>
   );
 };
