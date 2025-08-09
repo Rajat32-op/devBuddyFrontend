@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Heart, MessageCircle, User, BookmarkPlus } from "lucide-react";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import CodeBlock from "./CodeBlock";
 import { useUser } from "../providers/getUser";
 import { useNavigate } from "react-router-dom";
+import { div } from "framer-motion/client";
 
 const PostCard = ({ post }) => {
   function timeAgo(date) {
@@ -34,7 +35,25 @@ const PostCard = ({ post }) => {
   const [likes, setLikes] = useState(post.likes);
   const [likeDisabled, setLikeDisabled] = useState(false);
   const [isSaved, setIsSaved] = useState(user.savedPosts.includes(post._id));
-  const [saveDisabled,setSavedisbled]=useState(false);
+  const [saveDisabled, setSavedisbled] = useState(false);
+  const [comments, setComments] = useState(true);
+  const [commentLoaded, setCommentLoaded] = useState(false);
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      const response = await fetch(`http://localhost:3000/get-comments?postId=${post._id}`, {
+        credentials: 'include'
+      })
+      if (response.ok) {
+        const data = await response.json();
+        setComments(data);
+        setCommentLoaded(true);
+      }
+    }
+    if (showComments && !commentLoaded) {
+      fetchComments();
+    }
+  }, [showComments])
 
   const handleLike = async () => {
     if (isLiked) {
@@ -74,27 +93,36 @@ const PostCard = ({ post }) => {
     }
   };
 
-  const handleComment = () => {
-    if (newComment.trim()) {
-      console.log("New comment:", newComment);
-      setNewComment("");
+  const handleComment = async () => {
+    if (newComment.trim() === "") return;
+    const data = {
+      postId: post._id, content: newComment, username: user.username, name: user.name,
+      profilePicture: user.profilePicture, createdAt: Date.now()
     }
+    setComments([...comments, data]);
+    setNewComment("");
+    const response = await fetch('http://localhost:3000/add-comment', {
+      method: 'POST',
+      credentials: 'include',
+      body: JSON.stringify(data),
+      headers: { 'Content-Type': 'application/json' }
+    })
   };
 
   const handleSave = async (id) => {
     setSavedisbled(true)
-    let path=""
-    if(isSaved){
-      path='http://localhost:3000/unsave-post'
+    let path = ""
+    if (isSaved) {
+      path = 'http://localhost:3000/unsave-post'
     }
-    else{
-      path='http://localhost:3000/save-post'
+    else {
+      path = 'http://localhost:3000/save-post'
     }
     setIsSaved(!isSaved);
-    
+
     const response = await fetch(path, {
       credentials: 'include',
-      method:'POST',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -112,7 +140,7 @@ const PostCard = ({ post }) => {
     <Card className="w-full bg-white dark:bg-gradient-to-br from-[#1a3760] via-[#4b5f7e] to-[#c9d1db] text-black dark:text-white border border-zinc-300 dark:border-zinc-700">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <div onClick={()=>{navigate(`/user?id=${post.userId}`)}} className="flex items-center space-x-3">
+          <div onClick={() => { navigate(`/user?id=${post.userId}`) }} className="flex items-center space-x-3">
             <Avatar className="cursor-pointer">
               <AvatarImage src={post.profilePicture || ''} />
               <AvatarFallback>
@@ -201,7 +229,7 @@ const PostCard = ({ post }) => {
             </button>
           </div>
           <div className="">
-            <button disabled={saveDisabled} onClick={()=>{handleSave(post._id)}}>
+            <button disabled={saveDisabled} onClick={() => { handleSave(post._id) }}>
               <BookmarkPlus className={`${isSaved ? "fill-current" : ""} mr-1 h-7 w-7`}></BookmarkPlus>
             </button>
           </div>
@@ -211,21 +239,50 @@ const PostCard = ({ post }) => {
         {showComments && (
           <div className="space-y-3 pt-3 border-t border-zinc-200 dark:border-zinc-700">
             {/* Sample Comments */}
+            {showComments && (
+              comments.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  {comments.map(comment => (
+                    <div key={comment._id} className="bg-gray-800 rounded-xl p-4 flex items-start gap-3 shadow-md">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={comment.profilePicture}></AvatarImage>
+                        <AvatarFallback>{comment.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-white">{comment.name}</span>
+                          <span className="text-gray-400 text-sm">{timeAgo(comment.createdAt)}</span>
+                        </div>
+                        <p className="text-gray-200">
+                          {comment.content}
+                        </p>
+                      </div>
+                    </div>
+
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-transparent text-black text-xl font-serif">No Comments Yet</div>
+              )
+            )}
             {/* Add Comment */}
-            <div className="flex space-x-2">
+            <div className="flex items-center space-x-2">
               <Avatar className="h-6 w-6">
+                <AvatarImage src={user.profilePicture} className="h-full w-full"></AvatarImage>
                 <AvatarFallback className="text-xs">
                   <User className="h-3 w-3" />
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 flex space-x-2">
-                <textarea
-                  placeholder="Add a comment..."
+                <input
+                  placeholder="Leave a comment ..."
                   value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  className="min-h-[60px] text-sm dark:bg-zinc-800 dark:text-white"
+                  onChange={(e) => { setNewComment(e.target.value) }}
+                  onKeyPress={(e) => e.key === "Enter" && handleComment()}
+                  required
+                  className="flex-1 bg-zinc-900 text-white px-4 py-2 rounded-full outline-none"
                 />
-                <button onClick={handleComment}>
+                <button className="bg-purple-500 rounded-full px-2" onClick={handleComment}>
                   Post
                 </button>
               </div>
