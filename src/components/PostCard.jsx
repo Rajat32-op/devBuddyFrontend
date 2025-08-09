@@ -211,29 +211,6 @@ const PostCard = ({ post }) => {
         {showComments && (
           <div className="space-y-3 pt-3 border-t border-zinc-200 dark:border-zinc-700">
             {/* Sample Comments */}
-            <div className="space-y-2">
-              <div className="flex space-x-2">
-                <Avatar className="h-6 w-6">
-                  <AvatarFallback className="text-xs">JD</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <p className="text-sm">
-                    <span className="font-medium">jane_dev</span> Great code! Very clean implementation 👏
-                  </p>
-                </div>
-              </div>
-              <div className="flex space-x-2">
-                <Avatar className="h-6 w-6">
-                  <AvatarFallback className="text-xs">MS</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <p className="text-sm">
-                    <span className="font-medium">mike_codes</span> Thanks for sharing! This helped me solve a similar issue.
-                  </p>
-                </div>
-              </div>
-            </div>
-
             {/* Add Comment */}
             <div className="flex space-x-2">
               <Avatar className="h-6 w-6">

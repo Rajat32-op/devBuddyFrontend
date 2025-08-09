@@ -1,11 +1,15 @@
-import { useState, useEffect, useCallback ,useRef} from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   MessageCircle,
   Trash2,
   Plus,
   ArrowLeft,
   Send,
-  MoreVertical
+  MoreVertical,
+  Image,
+  Code,
+  X,
+  Loader2
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../components/ui/dialog";
@@ -16,10 +20,11 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../providers/getUser.jsx";
 import Particles from "../components/particle-bg.jsx";
 import { debounce, method } from "lodash";
+import CodeBlock from '../components/CodeBlock.jsx'
 
 const Chat = () => {
 
-  const { user, loading ,socket} = useUser();
+  const { user, loading, socket } = useUser();
 
   if (loading) {
     return (
@@ -30,7 +35,11 @@ const Chat = () => {
     );
   }
   const navigate = useNavigate();
-
+  const languages = [
+    "JavaScript", "Python", "C++", "Java", "C", "Go", "TypeScript", "Ruby", "PHP",
+    "React", "swift", "Kotlin", "Rust", "Dart", "Scala", "Perl", "Haskell",
+    "Lua", "Shell", "HTML", "CSS", "SQL", "R"
+  ];
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedChat, setSelectedChat] = useState(null);
@@ -39,19 +48,27 @@ const Chat = () => {
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([])
+  const [images, setImages] = useState([])
+  const [codes, setCodes] = useState([]);
+  const [codeLang, setCodeLang] = useState([]);
+  const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [codeSnippet, setCodeSnippet] = useState("");
+  const [enterCode, setEnterCode] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("")
 
-  useEffect(()=>{
-    const fetchChats=async()=>{
-      const response=await fetch('http://localhost:3000/get-chats',{
-        credentials:'include'
+  useEffect(() => {
+    const fetchChats = async () => {
+      const response = await fetch('http://localhost:3000/get-chats', {
+        credentials: 'include'
       });
-      if(response.ok){
-        const data=await response.json();
+      if (response.ok) {
+        const data = await response.json();
         setChats(data);
       }
     }
     fetchChats();
-  },[])
+  }, [])
 
   const handleSearch = useCallback(debounce(async (searchName) => {
     setSearchOpen(true);
@@ -111,13 +128,33 @@ const Chat = () => {
     setChats(prev => prev.map(c => c.id === chat.id ? { ...c, unreadCount: 0 } : c));
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async (e) => {
+    e?.preventDefault();
     if (!newMessage.trim()) return;
-
+    let imageUrls = []
+    let imageIds = []
+    if (images.length > 0) {
+      const formData = new FormData();
+      images.forEach(img => {
+        formData.append('images', img);
+      })
+      setSending(true);
+      const response = await fetch('http://localhost:3000/upload-chat-image', {
+        credentials: 'include',
+        method: 'POST',
+        body: formData
+      })
+      if (response.ok) {
+        const data = await response.json();
+        imageUrls = data.urls;
+        imageIds = data.ids;
+      }
+      setSending(false);
+    }
     const isGroup = selectedChat.isGroup || false;
     const currentUserId = user._id;
     const receiverId = isGroup ? null : selectedChat._id;
-    selectedChat.isOnline=true;
+    selectedChat.isOnline = true;
     const roomId = isGroup
       ? selectedChat._id
       : [currentUserId, receiverId].sort().join("-");
@@ -126,8 +163,15 @@ const Chat = () => {
       senderId: currentUserId,
       receiverId,
       message: newMessage.trim(),
-      isGroup
+      isGroup,
+      imageUrls,
+      imageIds,
+      codes,
+      codeLang
     });
+    setImages([]);
+    setCodeLang([]);
+    setCodes([])
     setNewMessage("");
   };
 
@@ -136,6 +180,16 @@ const Chat = () => {
     setShowChatList(true);
     setSelectedChat(null);
   };
+
+  const handleImageChange = (e) => {
+    const file = Array.from(e.target.files);
+    if (file.length + images.length > 7) {
+      setError('You can only upload up to 7 images');
+      setTimeout(() => { setError(null) }, 2000);
+      return;
+    }
+    setImages([...images, ...file]);
+  }
 
   useEffect(() => {
     if (!selectedChat) return;
@@ -150,8 +204,8 @@ const Chat = () => {
     socket.emit("joinRoom", roomId);
 
     // Fetch old messages (REST)
-    fetch(`http://localhost:3000/get-messages?roomId=${roomId}`,{
-      credentials:'include'
+    fetch(`http://localhost:3000/get-messages?roomId=${roomId}`, {
+      credentials: 'include'
     })
       .then(res => res.json())
       .then(data => setMessages(data));
@@ -199,7 +253,11 @@ const Chat = () => {
     <>
       <div className="min-h-screen bg-gray-900 text-white dark overflow-x-hidden">
         <Navbar />
-
+        {error && (
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 bg-red-500 text-white px-4 py-2 rounded shadow-md transition-all duration-300">
+            {error}
+          </div>
+        )}
         <div className="h-[calc(100vh-64px)] flex">
           {/* Left */}
           <div className={`${showChatList ? 'block' : 'hidden'} lg:block w-full lg:w-80 border-r border-gray-800`}>
@@ -323,27 +381,111 @@ const Chat = () => {
                       >
                         <p className="text-sm">{message.message}</p>
                         <p className="text-xs mt-1 text-zinc-300">{message.timestamp}</p>
+                        <div className="flex flex-col justify-center">
+                          {message.imageUrls.map(url => (
+                            <img src={url} className="w-auto h-auto"></img>
+                          ))}
+                        </div>
+                        <div className="flex flex-col gap-2 max-w-1/2">
+                          {message.codeSnippet.map((code, index) => {
+                            return (
+                              <CodeBlock
+                                key={index}
+                                code={code}
+                                language={message.languages[index]}></CodeBlock>
+                            )
+                          })}
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
 
                 <div className="p-4 border-t border-zinc-800">
-                  <div className="flex items-center gap-2">
+                  {images.length > 0 && (
+                    <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 ">
+                      {images.map((image, index) => (
+                        <div key={index} className="relative mb-3">
+                          <img src={URL.createObjectURL(image)} alt={`Preview ${index}`} className="w-1/4 h-auto rounded" />
+                          <button
+                            type="button"
+                            onClick={() => setImages(images.filter((_, i) => i !== index))}
+                            className="absolute top-0 right-2/3 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                          >
+                            &times;
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {codes.length > 0 && (
+                    <div className="mt-2">
+                      {codes.map((code, index) => (
+                        <div key={index}
+                          title={code}
+                          className="flex items-center my-1"
+                        >
+
+                          <div
+                            className="cursor-pointer px-2 py-1 bg-zinc-800 rounded text-xs truncate max-w-full flex-1"
+
+                            onClick={() => {
+                              setEnterCode(true);
+                              setCodeSnippet(code);
+                              setSelectedLanguage(codeLang[index]);
+                              setCodeLang(codeLang.filter((_, i) => i !== index))
+                              setCodes(codes.filter((_, i) => i !== index));
+                            }}
+                          >
+
+                            <pre className="inline">{code.replace(/\s+/g, ' ').slice(0, 80)}{code.length > 80 ? '...' : ''}</pre>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={e => {
+                              e.stopPropagation();
+                              setCodes(codes.filter((_, i) => i !== index));
+                              setCodeLang(codeLang.filter((_, i) => i !== index));
+                            }}
+                            className="ml-2 h-5 w-5 text-red-500 hover:text-red-700 flex-shrink-0"
+                          >
+                            <X className="w-full h-full"></X>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <form onSubmit={handleSendMessage} encType="multipart/form-data" className="flex items-center gap-2">
                     <input
                       placeholder="Type a message..."
                       value={newMessage}
+                      required
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                       className="flex-1 bg-zinc-800 text-white px-4 py-2 rounded-full outline-none"
                     />
+                    <input onChange={handleImageChange} type='file' id="image" name="image" accept="image/png, image/jpeg" className="hidden" />
+                    <label htmlFor="image" className="px-3 py-1 text-sm border border-zinc-500 rounded bg-zinc-800 cursor-pointer relative group">
+                      <Image></Image>
+                      <p className="absolute bottom-full mb-2 px-2 py-1 text-sm text-white bg-black rounded opacity-0 z-20 group-hover:opacity-100 transition-opacity">Image</p>
+                    </label>
+                    <input onClick={() => { setEnterCode(true) }} id="codeSnippet" name="codeSnippet" className="hidden" />
+                    <label htmlFor="codeSnippet" className="group px-3 py-1 text-sm border border-zinc-500 rounded bg-zinc-800 cursor-pointer relative">
+                      <Code></Code>
+                      <p className="absolute bottom-full mb-2 px-2 py-1 text-sm text-white bg-black rounded opacity-0 z-20 group-hover:opacity-100 transition-opacity">Code Snippet</p>
+                    </label>
                     <button
-                      onClick={handleSendMessage}
-                      className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700"
+                      disabled={sending}
+                      type="submit"
+                      className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Send className="h-4 w-4" />
+                      {sending ? (
+                        <Loader2 className="animate-spin w-5 h-5" />
+                      ) : (
+                        <Send className="w-5 h-5" />
+                      )}
                     </button>
-                  </div>
+                  </form>
                 </div>
               </div>
             ) : (
@@ -403,6 +545,50 @@ const Chat = () => {
           </Command>
         </DialogContent>
       </Dialog>
+      {enterCode && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg space-y-4">
+            <h2 className="text-xl font-semibold">Add Your Code Snippet</h2>
+
+            <textarea
+              value={codeSnippet}
+              onChange={(e) => setCodeSnippet(e.target.value)}
+              placeholder="Write your code here..."
+              rows={6}
+              className="w-full border rounded p-2 font-mono resize-none"
+            />
+
+            <select
+              value={selectedLanguage}
+              onChange={(e) => setSelectedLanguage(e.target.value)}
+              className="w-full border p-2 rounded"
+            >
+              <option value="">Select Language</option>
+              {languages.map((lang) => (
+                <option key={lang} value={lang}>{lang}</option>
+              ))}
+            </select>
+
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => { setEnterCode(false); setCodeSnippet(""); setSelectedLanguage("") }}
+                className="px-4 py-2 border rounded hover:bg-gray-100"
+              >
+                Discard
+              </button>
+              <button
+                onClick={() => {
+                  setEnterCode(false); setCodes([...codes, codeSnippet]); setCodeLang([...codeLang, selectedLanguage]);
+                  setCodeSnippet(""); setSelectedLanguage("");
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
