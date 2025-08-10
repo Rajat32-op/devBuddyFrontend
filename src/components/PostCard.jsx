@@ -203,7 +203,7 @@ const PostCard = ({ post }) => {
         {/* Tags */}
         <div className="flex flex-wrap gap-2">
           {post.tags.map((tag) => (
-            <div key={tag} className="text-xs dark:bg-zinc-800 dark:text-zinc-300">
+            <div key={tag} className="text-sm dark:bg-zinc-800 dark:text-blue-300 p-1">
               #{tag}
             </div>
           ))}
