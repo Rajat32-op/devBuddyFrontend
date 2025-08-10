@@ -1,17 +1,12 @@
-import { useRef, useEffect, useState, use } from "react";
+import { useRef, useEffect, useState } from "react";
 import { User, X } from "lucide-react";
-
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import ScrollToTopButton from "../components/ScrollToTop";
-
 import { useUser } from "../providers/getUser.jsx";
-import { Prism } from "react-syntax-highlighter";
-import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
-
 
 const Home = () => {
 
@@ -23,6 +18,8 @@ const Home = () => {
 
   const messageRef = useRef(null);
 
+  const navigate=useNavigate();
+
   const [enterCode, setEnterCode] = useState(false);
   const [codeSnippet, setCodeSnippet] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState("JavaScript");
@@ -30,9 +27,9 @@ const Home = () => {
   const [message, setMessage] = useState(null);
   const [images, setImages] = useState([]);
   const [posting, setPosting] = useState(false);
-
   const [codes, setCodes] = useState([]);
   const [codeLang, setCodeLang] = useState([]);
+  const [suggestedUsers,setSuggestedUsers]=useState([])
 
   const { user, loading, fetchUser } = useUser();
 
@@ -46,7 +43,18 @@ const Home = () => {
     setImages([...images, ...file]);
   }
 
-
+  useEffect(()=>{
+    const fetchSuggestions=async()=>{
+      const response=await fetch('http://localhost:3000/get-suggestion',{
+        credentials:'include'
+      })
+      if(response.ok){
+        const data=await response.json();
+        setSuggestedUsers(data);
+      }
+    }
+    fetchSuggestions();
+  },[])
 
   const handleNewPost = async (e) => {
     e.preventDefault();
@@ -238,27 +246,21 @@ const Home = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {[
-                        { name: "John Doe", username: "johncodes", mutualFriends: 3 },
-                        { name: "Lisa Wang", username: "lisadev", mutualFriends: 5 },
-                        { name: "Mike Johnson", username: "mikejs", mutualFriends: 2 }
-                      ].map((suggestion) => (
-                        <div key={suggestion.username} className="flex items-center justify-between">
+                      {suggestedUsers.map((suggestion) => (
+                        <div key={suggestion._id} className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
                             <Avatar className="h-8 w-8">
                               <AvatarFallback className="text-xs">
                                 {suggestion.name.split(' ').map(n => n[0]).join('')}
                               </AvatarFallback>
                             </Avatar>
-                            <div>
+                            <div className="flex flex-col gap-1">
                               <p className="text-sm font-medium">{suggestion.name}</p>
-                              <p className="text-xs text-zinc-400">
-                                {suggestion.mutualFriends} mutual connections
-                              </p>
+                              <p className="text-sm font-medium">@ {suggestion.username}</p>
                             </div>
                           </div>
-                          <button className="text-sm border border-zinc-600 px-2 py-1 rounded hover:bg-zinc-800">
-                            Connect
+                          <button onClick={()=>{navigate(`/user?id=${suggestion._id}`)}} className="text-sm border border-zinc-600 px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-900">
+                            View
                           </button>
                         </div>
                       ))}
