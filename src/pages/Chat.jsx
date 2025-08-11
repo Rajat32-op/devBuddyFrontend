@@ -98,7 +98,7 @@ const Chat = () => {
       body: JSON.stringify({ roomId: chatId })
     })
     setChats(prev => prev.filter(chat => chat.id !== chatId));
-    if (selectedChat?.id === chatId) {
+    if (selectedChat?._id === chatId) {
       setSelectedChat(null);
       setShowChatList(true);
     }
@@ -319,7 +319,7 @@ const Chat = () => {
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel className="text-white">Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="text-white hover:bg-zinc-800">Cancel</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => handleDeleteChat(chat.id)}
                           className="bg-red-600 text-white hover:bg-red-700"

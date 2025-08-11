@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { Heart, MessageCircle, User, BookmarkPlus } from "lucide-react";
+import { Heart, MessageCircle, User, BookmarkPlus, Trash } from "lucide-react";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 import CodeBlock from "./CodeBlock";
 import { useUser } from "../providers/getUser";
 import { useNavigate } from "react-router-dom";
-import { div } from "framer-motion/client";
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post, onDelete }) => {
   function timeAgo(date) {
     const now = Date.now();
     const postTime = new Date(date).getTime(); // supports both Date and ISO string
@@ -36,8 +36,9 @@ const PostCard = ({ post }) => {
   const [likeDisabled, setLikeDisabled] = useState(false);
   const [isSaved, setIsSaved] = useState(user.savedPosts.includes(post._id));
   const [saveDisabled, setSavedisbled] = useState(false);
-  const [comments, setComments] = useState(true);
+  const [comments, setComments] = useState([]);
   const [commentLoaded, setCommentLoaded] = useState(false);
+  const [wait,setWait]=useState(false)
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -109,6 +110,20 @@ const PostCard = ({ post }) => {
     })
   };
 
+  const deleteComment=async(id)=>{
+    setWait(true)
+    setComments(prev=>prev.filter(com=>com._id!==id));
+    const response=await fetch('http://localhost:3000/delete-comment',{
+      credentials:'include',
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id:id})
+    })
+    if(response.ok){
+      setWait(false);
+    }
+  }
+
   const handleSave = async (id) => {
     setSavedisbled(true)
     let path = ""
@@ -139,6 +154,11 @@ const PostCard = ({ post }) => {
   return (
     <Card className="w-full bg-white dark:bg-gradient-to-br from-[#1a3760] via-[#4b5f7e] to-[#c9d1db] text-black dark:text-white border border-zinc-300 dark:border-zinc-700">
       <CardHeader>
+        {wait && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50">
+          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
         <div className="flex items-center justify-between">
           <div onClick={() => { navigate(`/user?id=${post.userId}`) }} className="flex items-center space-x-3">
             <Avatar className="cursor-pointer">
@@ -154,6 +174,33 @@ const PostCard = ({ post }) => {
               </p>
             </div>
           </div>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button
+                className="text-white hover:text-red-500"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Trash className="h-4 w-4" />
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="bg-zinc-900 text-white">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Post</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete this post?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="text-white hover:bg-zinc-800">Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => onDelete(post._id)}
+                  className="bg-red-600 text-white hover:bg-red-700"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </CardHeader>
 
@@ -248,6 +295,7 @@ const PostCard = ({ post }) => {
                         <AvatarImage src={comment.profilePicture}></AvatarImage>
                         <AvatarFallback>{comment.name.charAt(0)}</AvatarFallback>
                       </Avatar>
+                        <div className="flex justify-between w-full">
                       <div className="flex flex-col">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-white">{comment.name}</span>
@@ -257,6 +305,13 @@ const PostCard = ({ post }) => {
                           {comment.content}
                         </p>
                       </div>
+                        <button
+                          className="text-white hover:text-red-500"
+                          onClick={() => deleteComment(comment._id)}
+                          >
+                          <Trash className="h-4 w-4" />
+                        </button>
+                          </div>
                     </div>
 
                   ))}
