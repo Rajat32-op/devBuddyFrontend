@@ -91,13 +91,18 @@ const Chat = () => {
   }, [searchQuery]);
 
   const handleDeleteChat = async (chatId) => {
+    const roomId=[chatId,user._id].sort().join("-")
     const response = await fetch('http://localhost:3000/delete-chat', {
       credentials: 'include',
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ roomId: chatId })
+      body: JSON.stringify({ roomId: roomId})
     })
-    setChats(prev => prev.filter(chat => chat.id !== chatId));
+    console.log('hi')
+    chats.map(chat=>{
+      console.log(chat._id);
+    })
+    setChats(prev => prev.filter(chat => chat._id !== chatId));
     if (selectedChat?._id === chatId) {
       setSelectedChat(null);
       setShowChatList(true);
@@ -116,7 +121,7 @@ const Chat = () => {
       unreadCount: 0,
       isOnline: false
     };
-    if (!chats.find(chat => chat.id === newChat.id)) setChats(prev => [newChat, ...prev]);
+    if (!chats.find(chat => chat._id === newChat._id)) setChats(prev => [newChat, ...prev]);
     setSearchOpen(false);
     setSearchQuery("");
     setSelectedChat(newChat);
@@ -125,7 +130,7 @@ const Chat = () => {
   const handleChatSelect = (chat) => {
     setSelectedChat(chat);
     setShowChatList(false);
-    setChats(prev => prev.map(c => c.id === chat.id ? { ...c, unreadCount: 0 } : c));
+    setChats(prev => prev.map(c => c.id === chat._id ? { ...c, unreadCount: 0 } : c));
   };
 
   const handleSendMessage = async (e) => {
@@ -198,7 +203,7 @@ const Chat = () => {
     const currentUserId = user?._id;
 
     const roomId = isGroup
-      ? selectedChat.id
+      ? selectedChat._id
       : [currentUserId, selectedChat._id].sort().join("-");
 
     socket.emit("joinRoom", roomId);
@@ -276,7 +281,7 @@ const Chat = () => {
                 <div
                   key={chat._id}
                   onClick={() => handleChatSelect(chat)}
-                  className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition ${selectedChat?.id === chat.id ? 'bg-zinc-800' : 'hover:bg-zinc-900'
+                  className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition ${selectedChat?._id === chat._id ? 'bg-zinc-800' : 'hover:bg-zinc-900'
                     }`}
                 >
                   <div className="relative">
@@ -321,7 +326,7 @@ const Chat = () => {
                       <AlertDialogFooter>
                         <AlertDialogCancel className="text-white hover:bg-zinc-800">Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={() => handleDeleteChat(chat.id)}
+                          onClick={() => handleDeleteChat(chat._id)}
                           className="bg-red-600 text-white hover:bg-red-700"
                         >
                           Delete
@@ -382,8 +387,8 @@ const Chat = () => {
                         <p className="text-sm">{message.message}</p>
                         <p className="text-xs mt-1 text-zinc-300">{message.timestamp}</p>
                         <div className="flex flex-col justify-center">
-                          {message.imageUrls.map(url => (
-                            <img src={url} className="w-auto h-auto"></img>
+                          {message.imageUrls.map((url,index) => (
+                            <img key={index} src={url} className="w-auto h-auto"></img>
                           ))}
                         </div>
                         <div className="flex flex-col gap-2 max-w-1/2">
