@@ -27,19 +27,20 @@ const PostCard = ({ post, onDelete }) => {
   }
 
   const navigate = useNavigate();
-  const { user } = useUser();
-
+  const { user ,loading} = useUser();
+  
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [likes, setLikes] = useState(post.likes);
   const [likeDisabled, setLikeDisabled] = useState(false);
-  const [isSaved, setIsSaved] = useState(user.savedPosts.includes(post._id));
+  const [isSaved, setIsSaved] = useState(user?user.savedPosts.includes(post._id):false);
   const [saveDisabled, setSavedisbled] = useState(false);
   const [comments, setComments] = useState([]);
   const [commentLoaded, setCommentLoaded] = useState(false);
   const [wait,setWait]=useState(false)
-
+  const [current, setCurrent] = useState(0);
+  
   useEffect(() => {
     const fetchComments = async () => {
       const response = await fetch(`http://localhost:3000/get-comments?postId=${post._id}`, {
@@ -55,7 +56,7 @@ const PostCard = ({ post, onDelete }) => {
       fetchComments();
     }
   }, [showComments])
-
+  
   const handleLike = async () => {
     if (isLiked) {
       setLikeDisabled(true)
@@ -78,7 +79,7 @@ const PostCard = ({ post, onDelete }) => {
       setLikeDisabled(true)
       setIsLiked(true);
       setLikes(likes + 1);
-
+      
       const response = await fetch(`http://localhost:3000/like-post`, {
         method: 'POST',
         body: JSON.stringify({ postId: post._id }),
@@ -93,7 +94,7 @@ const PostCard = ({ post, onDelete }) => {
       }
     }
   };
-
+  
   const handleComment = async () => {
     if (newComment.trim() === "") return;
     const data = {
@@ -109,7 +110,7 @@ const PostCard = ({ post, onDelete }) => {
       headers: { 'Content-Type': 'application/json' }
     })
   };
-
+  
   const deleteComment=async(id)=>{
     setWait(true)
     setComments(prev=>prev.filter(com=>com._id!==id));
@@ -123,7 +124,7 @@ const PostCard = ({ post, onDelete }) => {
       setWait(false);
     }
   }
-
+  
   const handleSave = async (id) => {
     setSavedisbled(true)
     let path = ""
@@ -134,7 +135,7 @@ const PostCard = ({ post, onDelete }) => {
       path = 'http://localhost:3000/save-post'
     }
     setIsSaved(!isSaved);
-
+    
     const response = await fetch(path, {
       credentials: 'include',
       method: 'POST',
@@ -149,8 +150,15 @@ const PostCard = ({ post, onDelete }) => {
     }
     setSavedisbled(false)
   }
-
-  const [current, setCurrent] = useState(0);
+  
+  if(loading){
+    return(
+      <div className="flex justify-center h-full gap-2 min-h-[200px]">
+        <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></span>
+        <span className="text-lg text-black">Loading...</span>
+      </div>
+    )
+  }
   return (
     <Card className="w-full bg-white dark:bg-gradient-to-br from-[#1a3760] via-[#4b5f7e] to-[#c9d1db] text-black dark:text-white border border-zinc-300 dark:border-zinc-700">
       <CardHeader>

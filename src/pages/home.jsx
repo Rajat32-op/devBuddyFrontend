@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import ScrollToTopButton from "../components/ScrollToTop";
+import PostCard from '../components/PostCard.jsx'
 import { useUser } from "../providers/getUser.jsx";
 
 const Home = () => {
@@ -33,8 +34,37 @@ const Home = () => {
   const [codeLang, setCodeLang] = useState([]);
   const [suggestedUsers, setSuggestedUsers] = useState([])
   const [trendingTags, setTrendingTags] = useState([]);
+  const [feedPosts, setFeedPosts] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [cursor, setCursor] = useState(null);
+  const [feedLoading, setFeedLoading] = useState(false);
 
   const { user, loading, fetchUser } = useUser();
+
+  const fetchFeed = async (initial = false) => {
+    if (feedLoading || (!hasMore && !initial)) return;
+    setFeedLoading(true);
+    const response = await fetch(`http://localhost:3000/?lastScore=${cursor?.lastScore}lastCreatedAt=${cursor?.lastCreatedAt}`, {
+      credentials: 'include'
+    })
+    if (response.status === 401) {
+      navigate('/login');
+    }
+    else if (response.status === 200) {
+      const data = await response.json();
+      console.log(data);
+      setFeedPosts(data.posts);
+      setCursor(data.nextCursor);
+      if (data.posts.length === 0 || !data.nextCursor) {
+        setHasMore(false);
+      }
+      setFeedLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchFeed(true);
+  }, []);
 
   const handleImageChange = (e) => {
     const file = Array.from(e.target.files);
@@ -56,7 +86,7 @@ const Home = () => {
         setSuggestedUsers(data);
       }
     }
-    
+
     const fetchTrendingTags = async () => {
       const response = await fetch('http://localhost:3000/get-trending-tags', {
         credentials: 'include'
@@ -77,8 +107,8 @@ const Home = () => {
     formData.append('caption', e.target.elements.caption.value);
     formData.append('codeSnippet', codes);
     formData.append('language', codeLang);
-    tags.forEach(tag=>{
-      formData.append('tags',tag);
+    tags.forEach(tag => {
+      formData.append('tags', tag);
     })
     images.forEach(file => {
       formData.append('images', file);
@@ -142,186 +172,200 @@ const Home = () => {
             </div>
 
             {/* Main Feed */}
-            <form onSubmit={handleNewPost} className="col-span-1 lg:col-span-2 space-y-6" encType="multipart/form-data">
-              {/* Create Post */}
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center space-x-3">
-                    <Avatar>
-                      <AvatarImage src="/placeholder.svg" />
-                      <AvatarFallback>
-                        <User className="h-4 w-4" />
-                      </AvatarFallback>
-                    </Avatar>
-                    <textarea
-                      name="caption"
-                      required
-                      placeholder="Share your code or thoughts with the community..."
-                      className="flex-1 min-h-[60px] resize-none bg-transparent border border-zinc-500 rounded px-3 py-2 text-white"
+            <div className="col-span-1 lg:col-span-2 space-y-6">
 
-                    />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex md:justify-between items-center">
-                    {/* Image & Code Buttons */}
-                    <div className="flex space-x-2">
-                      <input
-                        onChange={handleImageChange}
-                        disabled={posting}
-                        type="file"
-                        id="image"
-                        name="image"
-                        accept="image/png, image/jpeg"
-                        className="hidden"
+              <form onSubmit={handleNewPost} className="col-span-1 lg:col-span-2 space-y-6" encType="multipart/form-data">
+                {/* Create Post */}
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center space-x-3">
+                      <Avatar>
+                        <AvatarImage src="/placeholder.svg" />
+                        <AvatarFallback>
+                          <User className="h-4 w-4" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <textarea
+                        name="caption"
+                        required
+                        placeholder="Share your code or thoughts with the community..."
+                        className="flex-1 min-h-[60px] resize-none bg-transparent border border-zinc-500 rounded px-3 py-2 text-white"
+
                       />
-                      <label
-                        htmlFor="image"
-                        className="px-3 py-1 text-sm border border-zinc-500 rounded bg-zinc-800 cursor-pointer"
-                      >
-                        📷 Image
-                      </label>
-
-                      <input id="codeSnippet" disabled={posting} name="codeSnippet" className="hidden" />
-                      <label
-                        onClick={() => {
-                          setEnterCode(true);
-                        }}
-                        disabled={enterCode}
-                        htmlFor="codeSnippet"
-                        className="px-3 py-1 text-sm border border-zinc-500 rounded bg-zinc-800 cursor-pointer"
-                      >
-                        💻 Code
-                      </label>
                     </div>
-
-                    {/* Discard & Post Buttons */}
-                    <div className="flex space-x-4 sm:space-x-2">
-                      <button
-                        onClick={() => {
-                          setImages([]);
-                          setCodes([]);
-                          setCodeLang([]);
-                          setTags([]);
-                        }}
-                        disabled={posting}
-                        type="reset"
-                        className="px-1 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
-                      >
-                        Discard Post
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={posting}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded"
-                      >
-                        Post
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Image Preview */}
-                  {images.length > 0 && (
-                    <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                      {images.map((image, index) => (
-                        <div key={index} className="relative">
-                          <img src={URL.createObjectURL(image)} alt={`Preview ${index}`} className="w-full h-auto rounded" />
-                          <button
-                            type="button"
-                            onClick={() => setImages(images.filter((_, i) => i !== index))}
-                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                          >
-                            &times;
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Code Preview */}
-                  {codes.length > 0 && (
-                    <div className="mt-2">
-                      {codes.map((code, index) => (
-                        <div key={index} title={code} className="flex items-center my-1">
-                          <div
-                            className="cursor-pointer px-2 py-1 bg-zinc-800 rounded text-xs truncate max-w-full flex-1"
-                            onClick={() => {
-                              setEnterCode(true);
-                              setCodeSnippet(code);
-                              setSelectedLanguage(codeLang[index]);
-                              setCodeLang(codeLang.filter((_, i) => i !== index));
-                              setCodes(codes.filter((_, i) => i !== index));
-                            }}
-                          >
-                            <pre className="inline">
-                              {code.replace(/\s+/g, " ").slice(0, 80)}
-                              {code.length > 80 ? "..." : ""}
-                            </pre>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setCodes(codes.filter((_, i) => i !== index));
-                              setCodeLang(codeLang.filter((_, i) => i !== index));
-                            }}
-                            className="ml-2 h-5 w-5 text-red-500 hover:text-red-700 flex-shrink-0"
-                          >
-                            <X className="w-full h-full" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Tags Input */}
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-white mb-1">Tags</label>
-                    <div className="flex flex-wrap gap-2 border border-zinc-500 rounded p-2 min-h-[44px] bg-zinc-800">
-                      {tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs flex items-center gap-1"
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex md:justify-between items-center">
+                      {/* Image & Code Buttons */}
+                      <div className="flex space-x-2">
+                        <input
+                          onChange={handleImageChange}
+                          disabled={posting}
+                          type="file"
+                          id="image"
+                          name="image"
+                          accept="image/png, image/jpeg"
+                          className="hidden"
+                        />
+                        <label
+                          htmlFor="image"
+                          className="px-3 py-1 text-sm border border-zinc-500 rounded bg-zinc-800 cursor-pointer"
                         >
-                          {tag}
-                          <button
-                            type="button"
-                            className="text-white hover:text-red-300"
-                            onClick={() => setTags(tags.filter((_, i) => i !== index))}
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                      <input
-                        type="text"
-                        value={tagInput}
-                        onChange={(e) => setTagInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if ((e.key === "Enter" || e.key === ",") && tagInput.trim() !== "") {
-                            e.preventDefault();
-                            if (!tags.includes(tagInput.trim())) {
-                              setTags([...tags, tagInput.trim()]);
-                            }
-                            setTagInput("");
-                          }
-                        }}
-                        placeholder="Type and press Enter"
-                        className="flex-1 border-none outline-none bg-transparent text-sm text-white"
-                      />
+                          📷 Image
+                        </label>
+
+                        <input id="codeSnippet" disabled={posting} name="codeSnippet" className="hidden" />
+                        <label
+                          onClick={() => {
+                            setEnterCode(true);
+                          }}
+                          disabled={enterCode}
+                          htmlFor="codeSnippet"
+                          className="px-3 py-1 text-sm border border-zinc-500 rounded bg-zinc-800 cursor-pointer"
+                        >
+                          💻 Code
+                        </label>
+                      </div>
+
+                      {/* Discard & Post Buttons */}
+                      <div className="flex space-x-4 sm:space-x-2">
+                        <button
+                          onClick={() => {
+                            setImages([]);
+                            setCodes([]);
+                            setCodeLang([]);
+                            setTags([]);
+                          }}
+                          disabled={posting}
+                          type="reset"
+                          className="px-1 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
+                        >
+                          Discard Post
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={posting}
+                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded"
+                        >
+                          Post
+                        </button>
+                      </div>
                     </div>
-                  </div>
 
-                </CardContent>
-              </Card>
+                    {/* Image Preview */}
+                    {images.length > 0 && (
+                      <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                        {images.map((image, index) => (
+                          <div key={index} className="relative">
+                            <img src={URL.createObjectURL(image)} alt={`Preview ${index}`} className="w-full h-auto rounded" />
+                            <button
+                              type="button"
+                              onClick={() => setImages(images.filter((_, i) => i !== index))}
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                            >
+                              &times;
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
-              {/* Posts Feed */}
+                    {/* Code Preview */}
+                    {codes.length > 0 && (
+                      <div className="mt-2">
+                        {codes.map((code, index) => (
+                          <div key={index} title={code} className="flex items-center my-1">
+                            <div
+                              className="cursor-pointer px-2 py-1 bg-zinc-800 rounded text-xs truncate max-w-full flex-1"
+                              onClick={() => {
+                                setEnterCode(true);
+                                setCodeSnippet(code);
+                                setSelectedLanguage(codeLang[index]);
+                                setCodeLang(codeLang.filter((_, i) => i !== index));
+                                setCodes(codes.filter((_, i) => i !== index));
+                              }}
+                            >
+                              <pre className="inline">
+                                {code.replace(/\s+/g, " ").slice(0, 80)}
+                                {code.length > 80 ? "..." : ""}
+                              </pre>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCodes(codes.filter((_, i) => i !== index));
+                                setCodeLang(codeLang.filter((_, i) => i !== index));
+                              }}
+                              className="ml-2 h-5 w-5 text-red-500 hover:text-red-700 flex-shrink-0"
+                            >
+                              <X className="w-full h-full" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Tags Input */}
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-white mb-1">Tags</label>
+                      <div className="flex flex-wrap gap-2 border border-zinc-500 rounded p-2 min-h-[44px] bg-zinc-800">
+                        {tags.map((tag, index) => (
+                          <span
+                            key={index}
+                            className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs flex items-center gap-1"
+                          >
+                            {tag}
+                            <button
+                              type="button"
+                              className="text-white hover:text-red-300"
+                              onClick={() => setTags(tags.filter((_, i) => i !== index))}
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                        <input
+                          type="text"
+                          value={tagInput}
+                          onChange={(e) => setTagInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if ((e.key === "Enter" || e.key === ",") && tagInput.trim() !== "") {
+                              e.preventDefault();
+                              if (!tags.includes(tagInput.trim())) {
+                                setTags([...tags, tagInput.trim()]);
+                              }
+                              setTagInput("");
+                            }
+                          }}
+                          placeholder="Type and press Enter"
+                          className="flex-1 border-none outline-none bg-transparent text-sm text-white"
+                        />
+                      </div>
+                    </div>
+
+                  </CardContent>
+                </Card>
+
+                {/* Posts Feed */}
+              </form>
               <div className="space-y-6 overflow-x-auto">
-                {/* {posts.map((post) => (
-                <PostCard key={post.id} post={post} />
-                ))} */}
+                {!feedLoading && feedPosts.map((post) => (
+                  <PostCard key={post._id} post={post} />
+                ))}
+                {feedLoading && (<div className="flex justify-center h-full gap-2 min-h-[200px]">
+                  <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></span>
+                  <span className="text-lg text-black">Loading...</span>
+                </div>)}
+                {!hasMore && <p className="text-center text-black mt-4">🎉 You’re all caught up!</p>}
+                {hasMore && !feedLoading && (
+                  <button onClick={() => fetchFeed()} className="block mx-auto mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+                    Load more
+                  </button>
+                )}
               </div>
-            </form>
+
+            </div>
 
             {/* Right Sidebar */}
             <div className="lg:col-span-1 hidden lg:block">
