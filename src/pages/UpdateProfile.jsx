@@ -7,11 +7,12 @@ import { useNavigate } from "react-router-dom"
 const UpdateProfile = () => {
     const navigate = useNavigate()
     const { user, fetchUser } = useUser()
-    const [name,setName] = useState(user.name || "")
-    const [username,setUsername] = useState(user.username || "")
-    const [bio,setBio] = useState(user.bio || "")
+    const [name, setName] = useState(user.name || "")
+    const [username, setUsername] = useState(user.username || "")
+    const [bio, setBio] = useState(user.bio || "")
 
     const [loading, setLoading] = useState(false)
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     const handleUpdate = async (e) => {
         e.preventDefault()
@@ -20,12 +21,12 @@ const UpdateProfile = () => {
         formData.append('name', name)
         formData.append('username', username)
         formData.append('bio', bio)
-        if(e.target.elements.profilePicture.files[0])formData.append('profilePicture', e.target.elements.profilePicture.files[0])
+        if (e.target.elements.profilePicture.files[0]) formData.append('profilePicture', e.target.elements.profilePicture.files[0])
         setLoading(true)
-        const response = await fetch("http://localhost:3000/edit-profile", {
+        const response = await fetch(`${backendUrl}/edit-profile`, {
             method: 'PATCH',
             credentials: 'include',
-            body:formData
+            body: formData
         })
 
         if (response.ok) {
@@ -34,7 +35,7 @@ const UpdateProfile = () => {
             setLoading(false)
         }
     }
-    if(loading){
+    if (loading) {
         return (
             <div className="min-h-screen bg-background text-foreground dark:bg-black dark:text-white">
                 <Navbar />

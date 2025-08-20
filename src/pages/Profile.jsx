@@ -13,9 +13,11 @@ const Profile = () => {
   const { user, setUser, loading } = useUser();
   const [userPosts, setUserPosts] = useState([]);
   const [wait, setWait] = useState(false);
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await fetch(`http://localhost:3000/get-posts?userId=${user._id}`, {
+      const response = await fetch(`${backendUrl}/get-posts?userId=${user._id}`, {
         method: 'GET',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' }
@@ -34,7 +36,7 @@ const Profile = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("http://localhost:3000/logout", {
+      const response = await fetch(`${backendUrl}/logout`, {
         method: "POST",
         credentials: "include"
       });
@@ -50,7 +52,7 @@ const Profile = () => {
   const handleDeletePost = async (postId) => {
     setWait(true)
     setUserPosts(prev => prev.filter(post => post._id !== postId))
-    const response = await fetch('http://localhost:3000/delete-post', {
+    const response = await fetch(`${backendUrl}/delete-post`, {
       credentials: 'include',
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

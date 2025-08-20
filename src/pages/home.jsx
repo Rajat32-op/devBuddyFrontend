@@ -41,10 +41,13 @@ const Home = () => {
 
   const { user, loading, fetchUser } = useUser();
 
+  const backendUrl=import.meta.env.VITE_BACKEND_URL;
+  console.log(backendUrl);
+
   const fetchFeed = async (initial = false) => {
     if (feedLoading || (!hasMore && !initial)) return;
     setFeedLoading(true);
-    const response = await fetch(`http://localhost:3000/?lastScore=${cursor?.lastScore}lastCreatedAt=${cursor?.lastCreatedAt}`, {
+    const response = await fetch(`${backendUrl}/?lastScore=${cursor?.lastScore}lastCreatedAt=${cursor?.lastCreatedAt}`, {
       credentials: 'include'
     })
     if (response.status === 401) {
@@ -78,7 +81,7 @@ const Home = () => {
 
   useEffect(() => {
     const fetchSuggestions = async () => {
-      const response = await fetch('http://localhost:3000/get-suggestion', {
+      const response = await fetch(`${backendUrl}/get-suggestion`, {
         credentials: 'include'
       })
       if (response.ok) {
@@ -88,7 +91,7 @@ const Home = () => {
     }
 
     const fetchTrendingTags = async () => {
-      const response = await fetch('http://localhost:3000/get-trending-tags', {
+      const response = await fetch(`${backendUrl}/get-trending-tags`, {
         credentials: 'include'
       })
       if (response.ok) {
@@ -116,7 +119,7 @@ const Home = () => {
 
     try {
       setPosting(true);
-      const response = await fetch('http://localhost:3000/add-post', {
+      const response = await fetch(`${backendUrl}/add-post`, {
         method: 'POST',
         credentials: 'include',
         body: formData

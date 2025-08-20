@@ -7,18 +7,19 @@ export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [socket,setSocket]=useState(null)
+    const backendUrl=import.meta.env.VITE_BACKEND_URL;
     async function fetchUser() {
         setUser(undefined);
         setLoading(true);
         try {
-            const response = await fetch("http://localhost:3000/me", {
+            const response = await fetch(`${backendUrl}/me`, {
                 method: "GET",
                 credentials: "include"
             });
             if (response.status === 200) {
                 let tempuser = await response.json();
                 setUser(tempuser);
-                setSocket( io("http://localhost:3000", {
+                setSocket( io(`${backendUrl}`, {
                   withCredentials: true,
                   transports: ['websocket'],
                   reconnection:false,

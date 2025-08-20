@@ -27,6 +27,8 @@ const Chat = () => {
 
   const { user, loading, socket } = useUser();
 
+  const backendUrl=import.meta.env.VITE_BACKEND_URL;
+
   function timeAgo(date) {
     const now = Date.now();
     const postTime = new Date(date).getTime(); // supports both Date and ISO string
@@ -87,7 +89,7 @@ const Chat = () => {
   useEffect(() => {
     const fetchChats = async () => {
       setChatsLoading(true);
-      const response = await fetch('http://localhost:3000/get-chats', {
+      const response = await fetch(`${backendUrl}/get-chats`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -100,7 +102,7 @@ const Chat = () => {
   }, [])
 
   const handleSearch = useCallback(debounce(async (searchName, mode) => {
-    const response = await fetch(`http://localhost:3000/search?q=${searchName}`, {
+    const response = await fetch(`${backendUrl}/search?q=${searchName}`, {
       credentials: 'include'
     });
     if (response.status === 200) {
@@ -137,7 +139,7 @@ const Chat = () => {
 
   const handleDeleteChat = async (chatId, isGroup) => {
 
-    const response = await fetch('http://localhost:3000/delete-chat', {
+    const response = await fetch(`${backendUrl}/delete-chat`, {
       credentials: 'include',
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -182,7 +184,7 @@ const Chat = () => {
       }, 2000);
       return;
     }
-    const response = await fetch('http://localhost:3000/create-group', {
+    const response = await fetch(`${backendUrl}/create-group`, {
       credentials: 'include',
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -230,7 +232,7 @@ const Chat = () => {
         formData.append('images', img);
       })
       setSending(true);
-      const response = await fetch('http://localhost:3000/upload-chat-image', {
+      const response = await fetch(`${backendUrl}/upload-chat-image`, {
         credentials: 'include',
         method: 'POST',
         body: formData
@@ -292,7 +294,7 @@ const Chat = () => {
 
     // Fetch old messages (REST)
     setMessageLoading(true);
-    fetch(`http://localhost:3000/get-messages?roomId=${roomId}`, {
+    fetch(`${backendUrl}/get-messages?roomId=${roomId}`, {
       credentials: 'include'
     })
       .then(res => res.json())
@@ -354,7 +356,7 @@ const Chat = () => {
   const chatRef = useRef(null);
 
   const fetchMembers = async (id) => {
-    const response = await fetch(`http://localhost:3000/get-group-members?id=${id}`, {
+    const response = await fetch(`${backendUrl}/get-group-members?id=${id}`, {
       credentials: 'include'
     })
     if (response.ok) {

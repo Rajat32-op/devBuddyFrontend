@@ -26,10 +26,12 @@ const UserPage = () => {
 
     const [friendStatus, setFriendStatus] = useState("dont know");
     const { user, setUser } = useUser();
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
     useEffect(() => {
         const fetchUser = async () => {
             setLoading(true)
-            const response = await fetch(`http://localhost:3000/get-user?id=${userId}`, {
+            const response = await fetch(`${backendUrl}/get-user?id=${userId}`, {
                 credentials: 'include'
             });
             if (response.status === 200) {
@@ -62,7 +64,7 @@ const UserPage = () => {
         if (friendStatus == "friends") {
 
             const fetchPosts = async () => {
-                const response = await fetch(`http://localhost:3000/get-posts?userId=${profile._id}`, {
+                const response = await fetch(`${backendUrl}/get-posts?userId=${profile._id}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' }
@@ -82,7 +84,7 @@ const UserPage = () => {
     */
 
     const sendFriendRequest = async () => {
-        const response = await fetch(`http://localhost:3000/send-friend-request`, {
+        const response = await fetch(`${backendUrl}/send-friend-request`, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
@@ -100,7 +102,7 @@ const UserPage = () => {
 
 
     const acceptFriend = async (friendId) => {
-        const response = await fetch(`http://localhost:3000/add-friend`, {
+        const response = await fetch(`${backendUrl}/add-friend`, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
@@ -125,7 +127,7 @@ const UserPage = () => {
     }
 
     const removeFriend = async (friendId) => {
-        const response = await fetch(`http://localhost:3000/remove-friend`, {
+        const response = await fetch(`${backendUrl}/remove-friend`, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
@@ -148,7 +150,7 @@ const UserPage = () => {
     }
 
     const declineFriend = async (friendId) => {
-        const response = await fetch(`http://localhost:3000/decline-friend`, {
+        const response = await fetch(`${backendUrl}/decline-friend`, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
@@ -248,7 +250,7 @@ const UserPage = () => {
                             </div>
                         </CardContent>
                     </Card>
-                    
+
                     <div className="space-y-6">
                         {userPosts.map((post) => (
                             <PostCard key={post._id} post={post} />

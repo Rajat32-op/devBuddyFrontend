@@ -10,8 +10,8 @@ const avatar3 = "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=
 const avatar4 = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
 
 export default function Notifications() {
-  const {user,loading} = useUser();
-  if(loading){
+  const { user, loading } = useUser();
+  if (loading) {
     return (
       <div className="flex justify-center h-full gap-2 min-h-[200px ]">
         <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></span>
@@ -20,11 +20,13 @@ export default function Notifications() {
     );
   }
   const [notifications, setNotifications] = useState([]);
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  useEffect(()=>{
+
+  useEffect(() => {
     async function fetchNotifications() {
       try {
-        const response = await fetch("http://localhost:3000/notifications", {
+        const response = await fetch(`${backendUrl}/notifications`, {
           method: "GET",
           credentials: "include"
         });
@@ -39,7 +41,7 @@ export default function Notifications() {
       }
     }
     fetchNotifications();
-  },[])
+  }, [])
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
@@ -60,26 +62,26 @@ export default function Notifications() {
     console.log("All notifications marked as read");
   };
 
-  const acceptFriend = async (friendId,notifId) => {
-    const response = await fetch(`http://localhost:3000/add-friend`, {
+  const acceptFriend = async (friendId, notifId) => {
+    const response = await fetch(`${backendUrl}/add-friend`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ friendId: friendId })
     });
-    if(response.status === 200) {
+    if (response.status === 200) {
       setNotifications(notifications.filter(n => n._id !== notifId));
     }
   }
 
-  const declineFriend = async (friendId,notifId) => {
-    const response = await fetch(`http://localhost:3000/decline-friend`, {
+  const declineFriend = async (friendId, notifId) => {
+    const response = await fetch(`${backendUrl}/decline-friend`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ friendId: friendId })
     });
-    if(response.status === 200) {
+    if (response.status === 200) {
       setNotifications(notifications.filter(n => n._id !== notifId));
     }
   }
@@ -87,7 +89,7 @@ export default function Notifications() {
   return (
 
     <div className="min-h-screen w-full overflow-x-hidden bg-black text-white">
-        <Navbar />
+      <Navbar />
       <div className="max-w-2xl mx-auto p-6 ">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -115,7 +117,7 @@ export default function Notifications() {
                 <span>Mark all read</span>
               </button>
             )}
-            
+
           </div>
         </div>
 

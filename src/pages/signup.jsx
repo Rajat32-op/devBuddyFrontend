@@ -13,9 +13,10 @@ function Signup() {
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+  const backendUrl=import.meta.env.VITE_BACKEND_URL;
 
   const handleGoogleSignup = async (token) => {
-    const response = await fetch("http://localhost:3000/google-signup", {
+    const response = await fetch(`${backendUrl}/google-signup`, {
       method: 'POST',
       body: JSON.stringify({ token }),
       headers: { 'Content-Type': 'application/json' },
@@ -39,7 +40,7 @@ function Signup() {
       email: e.target.elements.email.value,
       password: e.target.elements.password.value
     }
-    const response = await fetch("http://localhost:3000/signup", {
+    const response = await fetch(`${backendUrl}/signup`, {
       method: 'POST',
       credentials: "include",
       body: JSON.stringify(data),

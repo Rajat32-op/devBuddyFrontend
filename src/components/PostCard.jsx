@@ -28,6 +28,8 @@ const PostCard = ({ post, onDelete, canDelete = false }) => {
 
   const navigate = useNavigate();
   const { user, loading } = useUser();
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [showComments, setShowComments] = useState(false);
@@ -43,7 +45,7 @@ const PostCard = ({ post, onDelete, canDelete = false }) => {
 
   useEffect(() => {
     const fetchComments = async () => {
-      const response = await fetch(`http://localhost:3000/get-comments?postId=${post._id}`, {
+      const response = await fetch(`${backendUrl}/get-comments?postId=${post._id}`, {
         credentials: 'include'
       })
       if (response.ok) {
@@ -62,7 +64,7 @@ const PostCard = ({ post, onDelete, canDelete = false }) => {
       setLikeDisabled(true)
       setIsLiked(false);
       setLikes(likes - 1);
-      const response = await fetch(`http://localhost:3000/unlike-post`, {
+      const response = await fetch(`${backendUrl}/unlike-post`, {
         method: 'POST',
         credentials: 'include',
         body: JSON.stringify({ postId: post._id }),
@@ -80,7 +82,7 @@ const PostCard = ({ post, onDelete, canDelete = false }) => {
       setIsLiked(true);
       setLikes(likes + 1);
 
-      const response = await fetch(`http://localhost:3000/like-post`, {
+      const response = await fetch(`${backendUrl}/like-post`, {
         method: 'POST',
         body: JSON.stringify({ postId: post._id }),
         credentials: 'include',
@@ -99,12 +101,12 @@ const PostCard = ({ post, onDelete, canDelete = false }) => {
     if (newComment.trim() === "") return;
     const data = {
       postId: post._id, content: newComment, username: user.username, name: user.name,
-      userId:user._id,
+      userId: user._id,
       profilePicture: user.profilePicture, createdAt: Date.now()
     }
     setComments([...comments, data]);
     setNewComment("");
-    const response = await fetch('http://localhost:3000/add-comment', {
+    const response = await fetch(`${backendUrl}/add-comment`, {
       method: 'POST',
       credentials: 'include',
       body: JSON.stringify(data),
@@ -115,7 +117,7 @@ const PostCard = ({ post, onDelete, canDelete = false }) => {
   const deleteComment = async (id) => {
     setWait(true)
     setComments(prev => prev.filter(com => com._id !== id));
-    const response = await fetch('http://localhost:3000/delete-comment', {
+    const response = await fetch(`${backendUrl}/delete-comment`, {
       credentials: 'include',
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -130,10 +132,10 @@ const PostCard = ({ post, onDelete, canDelete = false }) => {
     setSavedisbled(true)
     let path = ""
     if (isSaved) {
-      path = 'http://localhost:3000/unsave-post'
+      path = `${backendUrl}/unsave-post`
     }
     else {
-      path = 'http://localhost:3000/save-post'
+      path = `${backendUrl}/save-post`
     }
     setIsSaved(!isSaved);
 
@@ -317,14 +319,14 @@ const PostCard = ({ post, onDelete, canDelete = false }) => {
                             {comment.content}
                           </p>
                         </div>
-                        {comment.userId===user._id&&(
+                        {comment.userId === user._id && (
 
                           <button
-                          className="text-white hover:text-red-500"
-                          onClick={() => deleteComment(comment._id)}
+                            className="text-white hover:text-red-500"
+                            onClick={() => deleteComment(comment._id)}
                           >
-                          <Trash className="h-4 w-4" />
-                        </button>
+                            <Trash className="h-4 w-4" />
+                          </button>
                         )}
                       </div>
                     </div>

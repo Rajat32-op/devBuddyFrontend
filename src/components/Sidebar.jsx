@@ -9,11 +9,12 @@ import { useEffect, useState } from "react";
 const Sidebar = () => {
   const navigate = useNavigate();
   const {user,loading} = useUser(); 
+  const backendUrl=import.meta.env.VITE_BACKEND_URL;
 
   const [activeFriends,setActivefriends]=useState([]);
   useEffect(()=>{
     const fetchOnlineFriends=async()=>{
-      const response=await fetch('http://localhost:3000/get-online-friends',{
+      const response=await fetch(`${backendUrl}/get-online-friends`,{
         credentials:'include'
       })
       if(response.ok){

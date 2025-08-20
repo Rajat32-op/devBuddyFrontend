@@ -12,6 +12,7 @@ import { Command, CommandInput, CommandList, CommandItem, CommandGroup, CommandE
 
 const Navbar = () => {
   const navigate = useNavigate()
+  const backendUrl=import.meta.env.VITE_BACKEND_URL;
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -19,7 +20,7 @@ const Navbar = () => {
 
   const handleSearch = useCallback(debounce(async (searchName) => {
     setSearchOpen(true);
-    const response = await fetch(`http://localhost:3000/search?q=${searchName}`, {
+    const response = await fetch(`${backendUrl}/search?q=${searchName}`, {
       credentials: 'include'
     });
     if (response.status === 200) {
