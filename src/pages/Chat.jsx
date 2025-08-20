@@ -303,7 +303,6 @@ const Chat = () => {
         const unreadMessages = data
           .filter(msg => !msg.seenBy.includes(user._id))
           .map(msg => msg._id);
-        console.log(unreadMessages);
         if (unreadMessages.length > 0) {
           socket.emit("markSeen", {
             roomId: selectedChat._id,
@@ -333,7 +332,6 @@ const Chat = () => {
 
     // Seen update
     socket.on("messagesSeen", ({ roomId, userId, messageIds }) => {
-      console.log("user id",userId);
       if (selectedChat && selectedChat._id === roomId) {
         setMessages(prev =>
           prev.map(msg =>
@@ -538,7 +536,6 @@ const Chat = () => {
                         else {
                           totalUsers = 2;
                         }
-                        console.log(message.message,message.seenBy);
                         if (message.seenBy.length >= totalUsers) {
                           status = "seen"
                         }

@@ -42,7 +42,6 @@ const Home = () => {
   const { user, loading, fetchUser } = useUser();
 
   const backendUrl=import.meta.env.VITE_BACKEND_URL;
-  console.log(backendUrl);
 
   const fetchFeed = async (initial = false) => {
     if (feedLoading || (!hasMore && !initial)) return;
@@ -55,7 +54,6 @@ const Home = () => {
     }
     else if (response.status === 200) {
       const data = await response.json();
-      console.log(data);
       setFeedPosts(data.posts);
       setCursor(data.nextCursor);
       if (data.posts.length === 0 || !data.nextCursor) {
@@ -96,7 +94,6 @@ const Home = () => {
       })
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setTrendingTags(data);
       }
     }

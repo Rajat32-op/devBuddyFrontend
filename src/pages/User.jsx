@@ -92,7 +92,6 @@ const UserPage = () => {
         });
         if (response.status === 200) {
             setFriendStatus("request-sent");
-            console.log("Friend request sent successfully");
             setProfile(prev => ({ ...prev, friend_request_received: [...prev.friend_request_sent, user._id] }));
             setUser(prev => ({ ...prev, friend_request_sent: [...prev.friend_request_sent, profile._id] }));
         } else {
@@ -110,7 +109,6 @@ const UserPage = () => {
         });
         if (response.status === 200) {
             setFriendStatus("friends");
-            console.log("Friend request accepted successfully");
             setProfile(prev => ({
                 ...prev,
                 friends: [...prev.friends, friendId],
@@ -135,7 +133,6 @@ const UserPage = () => {
         });
         if (response.status === 200) {
             setFriendStatus("not-friend");
-            console.log("Friend removed successfully");
             setProfile(prev => ({
                 ...prev,
                 friends: prev.friends.filter(id => id !== friendId)
@@ -158,7 +155,6 @@ const UserPage = () => {
         });
         if (response.status === 200) {
             setFriendStatus("not-friend");
-            console.log("Friend request declined successfully");
             setProfile(prev => ({
                 ...prev,
                 friend_request_sent: prev.friend_request_sent.filter(id => id !== friendId)

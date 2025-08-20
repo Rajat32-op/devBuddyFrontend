@@ -147,7 +147,6 @@ const PostCard = ({ post, onDelete, canDelete = false }) => {
       },
       body: JSON.stringify({ postId: id })
     });
-    console.log(response.status);
     if (response.status != 200) {
       navigate('/login');
     }

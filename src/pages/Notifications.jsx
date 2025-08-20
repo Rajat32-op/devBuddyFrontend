@@ -59,7 +59,6 @@ export default function Notifications() {
     setNotifications(prev =>
       prev.map(notification => ({ ...notification, isRead: true }))
     );
-    console.log("All notifications marked as read");
   };
 
   const acceptFriend = async (friendId, notifId) => {
