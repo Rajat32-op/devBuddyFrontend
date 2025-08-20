@@ -146,7 +146,7 @@ const Profile = () => {
             {/* User Posts */}
             <div className="space-y-6">
               {userPosts.map((post) => (
-                <PostCard key={post._id} post={post} onDelete={(id) => { handleDeletePost(id) }} />
+                <PostCard key={post._id} post={post} canDelete={true} onDelete={(id) => { handleDeletePost(id) }} />
               ))}
             </div>
           </div>

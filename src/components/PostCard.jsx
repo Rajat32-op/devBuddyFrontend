@@ -7,7 +7,7 @@ import CodeBlock from "./CodeBlock";
 import { useUser } from "../providers/getUser";
 import { useNavigate } from "react-router-dom";
 
-const PostCard = ({ post, onDelete }) => {
+const PostCard = ({ post, onDelete, canDelete = false }) => {
   function timeAgo(date) {
     const now = Date.now();
     const postTime = new Date(date).getTime(); // supports both Date and ISO string
@@ -27,20 +27,20 @@ const PostCard = ({ post, onDelete }) => {
   }
 
   const navigate = useNavigate();
-  const { user ,loading} = useUser();
-  
+  const { user, loading } = useUser();
+
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [likes, setLikes] = useState(post.likes);
   const [likeDisabled, setLikeDisabled] = useState(false);
-  const [isSaved, setIsSaved] = useState(user?user.savedPosts.includes(post._id):false);
+  const [isSaved, setIsSaved] = useState(user ? user.savedPosts.includes(post._id) : false);
   const [saveDisabled, setSavedisbled] = useState(false);
   const [comments, setComments] = useState([]);
   const [commentLoaded, setCommentLoaded] = useState(false);
-  const [wait,setWait]=useState(false)
+  const [wait, setWait] = useState(false)
   const [current, setCurrent] = useState(0);
-  
+
   useEffect(() => {
     const fetchComments = async () => {
       const response = await fetch(`http://localhost:3000/get-comments?postId=${post._id}`, {
@@ -56,7 +56,7 @@ const PostCard = ({ post, onDelete }) => {
       fetchComments();
     }
   }, [showComments])
-  
+
   const handleLike = async () => {
     if (isLiked) {
       setLikeDisabled(true)
@@ -79,7 +79,7 @@ const PostCard = ({ post, onDelete }) => {
       setLikeDisabled(true)
       setIsLiked(true);
       setLikes(likes + 1);
-      
+
       const response = await fetch(`http://localhost:3000/like-post`, {
         method: 'POST',
         body: JSON.stringify({ postId: post._id }),
@@ -94,11 +94,12 @@ const PostCard = ({ post, onDelete }) => {
       }
     }
   };
-  
+
   const handleComment = async () => {
     if (newComment.trim() === "") return;
     const data = {
       postId: post._id, content: newComment, username: user.username, name: user.name,
+      userId:user._id,
       profilePicture: user.profilePicture, createdAt: Date.now()
     }
     setComments([...comments, data]);
@@ -110,21 +111,21 @@ const PostCard = ({ post, onDelete }) => {
       headers: { 'Content-Type': 'application/json' }
     })
   };
-  
-  const deleteComment=async(id)=>{
+
+  const deleteComment = async (id) => {
     setWait(true)
-    setComments(prev=>prev.filter(com=>com._id!==id));
-    const response=await fetch('http://localhost:3000/delete-comment',{
-      credentials:'include',
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({id:id})
+    setComments(prev => prev.filter(com => com._id !== id));
+    const response = await fetch('http://localhost:3000/delete-comment', {
+      credentials: 'include',
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id })
     })
-    if(response.ok){
+    if (response.ok) {
       setWait(false);
     }
   }
-  
+
   const handleSave = async (id) => {
     setSavedisbled(true)
     let path = ""
@@ -135,7 +136,7 @@ const PostCard = ({ post, onDelete }) => {
       path = 'http://localhost:3000/save-post'
     }
     setIsSaved(!isSaved);
-    
+
     const response = await fetch(path, {
       credentials: 'include',
       method: 'POST',
@@ -150,9 +151,9 @@ const PostCard = ({ post, onDelete }) => {
     }
     setSavedisbled(false)
   }
-  
-  if(loading){
-    return(
+
+  if (loading) {
+    return (
       <div className="flex justify-center h-full gap-2 min-h-[200px]">
         <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></span>
         <span className="text-lg text-black">Loading...</span>
@@ -163,10 +164,10 @@ const PostCard = ({ post, onDelete }) => {
     <Card className="w-full bg-white dark:bg-gradient-to-br from-[#1a3760] via-[#4b5f7e] to-[#c9d1db] text-black dark:text-white border border-zinc-300 dark:border-zinc-700">
       <CardHeader>
         {wait && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50">
-          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      )}
+          <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50">
+            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
         <div className="flex items-center justify-between">
           <div onClick={() => { navigate(`/user?id=${post.userId}`) }} className="flex items-center space-x-3">
             <Avatar className="cursor-pointer">
@@ -182,33 +183,36 @@ const PostCard = ({ post, onDelete }) => {
               </p>
             </div>
           </div>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button
-                className="text-white hover:text-red-500"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Trash className="h-4 w-4" />
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="bg-zinc-900 text-white">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete Post</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Are you sure you want to delete this post?
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="text-white hover:bg-zinc-800">Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => onDelete(post._id)}
-                  className="bg-red-600 text-white hover:bg-red-700"
+          {canDelete && (
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button
+                  className="text-white hover:text-red-500"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                  <Trash className="h-4 w-4" />
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-zinc-900 text-white">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Post</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete this post?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="text-white hover:bg-zinc-800">Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => onDelete(post._id)}
+                    className="bg-red-600 text-white hover:bg-red-700"
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
       </CardHeader>
 
@@ -303,23 +307,26 @@ const PostCard = ({ post, onDelete }) => {
                         <AvatarImage src={comment.profilePicture}></AvatarImage>
                         <AvatarFallback>{comment.name.charAt(0)}</AvatarFallback>
                       </Avatar>
-                        <div className="flex justify-between w-full">
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-white">{comment.name}</span>
-                          <span className="text-gray-400 text-sm">{timeAgo(comment.createdAt)}</span>
+                      <div className="flex justify-between w-full">
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-white">{comment.name}</span>
+                            <span className="text-gray-400 text-sm">{timeAgo(comment.createdAt)}</span>
+                          </div>
+                          <p className="text-gray-200">
+                            {comment.content}
+                          </p>
                         </div>
-                        <p className="text-gray-200">
-                          {comment.content}
-                        </p>
-                      </div>
-                        <button
+                        {comment.userId===user._id&&(
+
+                          <button
                           className="text-white hover:text-red-500"
                           onClick={() => deleteComment(comment._id)}
                           >
                           <Trash className="h-4 w-4" />
                         </button>
-                          </div>
+                        )}
+                      </div>
                     </div>
 
                   ))}

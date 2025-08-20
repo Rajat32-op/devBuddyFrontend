@@ -71,10 +71,6 @@ const Sidebar = () => {
               <User className="mr-2 h-5 w-5" />
               Profile
             </button>
-            <button  className="w-full flex items-center gap-2">
-              <Users className="mr-2 h-5 w-5" />
-              Friends
-            </button>
             <button onClick={()=>{navigate('/chat')}} className="w-full flex items-center gap-2">
               <MessageCircle className="mr-2 h-5 w-5" />
               Messages

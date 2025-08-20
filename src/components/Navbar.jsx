@@ -85,17 +85,11 @@ const Navbar = () => {
             {/* Icons */}
             <div className="flex items-center space-x-4">
               <button onClick={() => { navigate('/notifications') }} className="relative p-2 rounded hover:bg-zinc-800">
-                <Heart className="h-5 w-5 text-white" />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  3
-                </span>
+                <Heart className="h-6 w-6 text-white" />
               </button>
 
               <button onClick={() => { navigate('/chat') }} className="relative p-2 rounded hover:bg-zinc-800">
-                <MessageCircle className="h-5 w-5 text-white" />
-                <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  2
-                </span>
+                <MessageCircle className="h-6 w-6 text-white" />
               </button>
 
               <Avatar onClick={() => { navigate('/profile') }} className="h-8 w-8 cursor-pointer">
