@@ -46,7 +46,7 @@ const UpdateProfile = () => {
         )
     }
     return (
-        <div className="min-h-screen bg-background text-foreground bg-[url('bg_update_profile.png')] shadow-2xl dark:text-white">
+        <div className="min-h-screen bg-background text-foreground bg-[url('/bg_update_profile.png')] shadow-2xl dark:text-white">
             <Navbar />
             <div className="container mx-auto z-10 px-4 py-6">
                 <div className="max-w-4xl mx-auto text-white">
