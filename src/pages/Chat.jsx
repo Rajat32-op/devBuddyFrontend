@@ -57,7 +57,7 @@ const Chat = () => {
   }
   const navigate = useNavigate();
   const languages = [
-    "JavaScript", "Python", "C++", "Java", "C", "Go", "TypeScript", "Ruby", "PHP",
+    "JavaScript", "Python", "Cpp", "Java", "C", "Go", "TypeScript", "Ruby", "PHP",
     "React", "swift", "Kotlin", "Rust", "Dart", "Scala", "Perl", "Haskell",
     "Lua", "Shell", "HTML", "CSS", "SQL", "R"
   ];
